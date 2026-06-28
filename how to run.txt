@@ -1,0 +1,11 @@
+cmd /c ".\.venv\Scripts\activate.bat"
+pip install -r requirements.txt
+python app.py
+
+OR
+
+Option C: Use CMD instead of PowerShell
+Open Command Prompt in the project folder and run:
+.\.venv\Scripts\activate.bat
+pip install -r requirements.txt
+python app.py
