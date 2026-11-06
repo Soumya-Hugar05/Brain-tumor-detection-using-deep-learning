@@ -1,0 +1,47 @@
+{
+  "note": "Demo samples drawn at random from the approved validation split (seed 1337). Not test data.",
+  "manifest_sha256": "4d09b01d782fa076890f32bf30bcbbe1a2319c135ead2e58cbd5e1f9ec0d930f",
+  "split": "val",
+  "samples": [
+    {
+      "file": "sample_glioma_1.jpg",
+      "dataset_label": "glioma",
+      "source": "Training/glioma/Tr-gl_1159.jpg"
+    },
+    {
+      "file": "sample_glioma_2.jpg",
+      "dataset_label": "glioma",
+      "source": "Training/glioma/Tr-gl_548.jpg"
+    },
+    {
+      "file": "sample_meningioma_1.jpg",
+      "dataset_label": "meningioma",
+      "source": "Training/meningioma/Tr-me_790.jpg"
+    },
+    {
+      "file": "sample_meningioma_2.jpg",
+      "dataset_label": "meningioma",
+      "source": "Training/meningioma/Tr-me_847.jpg"
+    },
+    {
+      "file": "sample_notumor_1.jpg",
+      "dataset_label": "notumor",
+      "source": "Training/notumor/Tr-no_356.jpg"
+    },
+    {
+      "file": "sample_notumor_2.jpg",
+      "dataset_label": "notumor",
+      "source": "Training/notumor/Tr-no_503.jpg"
+    },
+    {
+      "file": "sample_pituitary_1.jpg",
+      "dataset_label": "pituitary",
+      "source": "Training/pituitary/Tr-pi_30.jpg"
+    },
+    {
+      "file": "sample_pituitary_2.jpg",
+      "dataset_label": "pituitary",
+      "source": "Training/pituitary/Tr-pi_435.jpg"
+    }
+  ]
+}

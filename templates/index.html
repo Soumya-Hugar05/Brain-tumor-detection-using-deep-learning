@@ -1,236 +1,192 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Brain Tumor MRI Detection</title>
-    <style>
-      :root {
-        --bg: #070a14;
-        --card: rgba(255,255,255,0.06);
-        --card2: rgba(255,255,255,0.08);
-        --border: rgba(255,255,255,0.14);
-        --text: #e9eeff;
-        --muted: rgba(233,238,255,0.72);
-        --brand: #7c3aed;
-        --brand2: #6366f1;
-        --danger: rgba(239,68,68,0.18);
-        --danger-border: rgba(239,68,68,0.55);
-      }
-      * { box-sizing: border-box; }
-      body {
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-        background: radial-gradient(1000px 600px at 20% 0%, rgba(124,58,237,0.22), transparent 60%),
-                    radial-gradient(900px 520px at 80% 10%, rgba(99,102,241,0.18), transparent 55%),
-                    var(--bg);
-        color: var(--text);
-        margin: 0;
-      }
-      a { color: inherit; }
-      .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 18px 40px; }
-      .top {
-        display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
-        padding: 6px 2px 18px;
-      }
-      .title { display: grid; gap: 6px; }
-      h1 { margin: 0; font-size: 22px; letter-spacing: 0.2px; }
-      .subtitle { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.35; }
-      .badge {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 8px 12px; border-radius: 999px;
-        background: rgba(124,58,237,0.14);
-        border: 1px solid rgba(124,58,237,0.35);
-        color: rgba(233,238,255,0.9);
-        font-weight: 600;
-        white-space: nowrap;
-      }
-
-      .grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-      @media (min-width: 980px) { .grid { grid-template-columns: 430px 1fr; } }
-
-      .card {
-        background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.045));
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        padding: 16px;
-        box-shadow: 0 18px 70px rgba(0,0,0,0.35);
-      }
-      .card h2 { margin: 0 0 10px; font-size: 14px; color: rgba(233,238,255,0.92); letter-spacing: 0.3px; }
-      .hint { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.35; }
-      .error { background: var(--danger); border: 1px solid var(--danger-border); padding: 10px 12px; border-radius: 14px; }
-
-      .drop {
-        position: relative;
-        display: grid;
-        gap: 10px;
-        padding: 14px;
-        border-radius: 16px;
-        background: rgba(0,0,0,0.18);
-        border: 1px dashed rgba(233,238,255,0.28);
-        transition: 120ms ease;
-      }
-      .drop.dragover { border-color: rgba(124,58,237,0.8); background: rgba(124,58,237,0.10); }
-      .fileRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-      .fileName { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      input[type="file"] { width: 100%; }
-      .actions { display: grid; gap: 10px; margin-top: 10px; }
-      button {
-        width: 100%;
-        padding: 11px 12px;
-        border: 0;
-        border-radius: 14px;
-        background: linear-gradient(90deg, var(--brand), var(--brand2));
-        color: white;
-        font-weight: 700;
-        cursor: pointer;
-        letter-spacing: 0.2px;
-      }
-      button:hover { filter: brightness(1.04); }
-      button:disabled { opacity: 0.65; cursor: not-allowed; }
-
-      .resultsTop { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-      .pill {
-        display: inline-flex; gap: 10px; align-items: center;
-        padding: 8px 12px;
-        border-radius: 999px;
-        background: rgba(99, 102, 241, 0.18);
-        border: 1px solid rgba(99, 102, 241, 0.5);
-      }
-      .pill b { color: rgba(233,238,255,0.95); }
-      .probList { margin-top: 12px; display: grid; gap: 10px; }
-      .probItem { display: grid; gap: 6px; }
-      .probHdr { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: rgba(233,238,255,0.88); }
-      .bar { height: 10px; border-radius: 999px; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.12); overflow: hidden; }
-      .bar > div { height: 100%; background: linear-gradient(90deg, rgba(124,58,237,0.9), rgba(99,102,241,0.9)); width: 0%; }
-
-      .imgs { margin-top: 14px; display: grid; grid-template-columns: 1fr; gap: 14px; }
-      @media (min-width: 980px) { .imgs { grid-template-columns: 1fr 1fr; } }
-      .imgbox { background: rgba(0,0,0,0.18); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
-      .imgcap { padding: 10px 12px; font-size: 12px; color: var(--muted); border-bottom: 1px solid rgba(255,255,255,0.10); }
-      img { width: 100%; height: auto; display: block; }
-    </style>
+    <meta name="color-scheme" content="dark light" />
+    <title>NeuroInsight – Brain MRI Analysis Platform (Research Prototype)</title>
+    {% include "_theme_init.html" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
   </head>
   <body>
-    <div class="wrap">
-      <div class="top">
-        <div class="title">
-          <h1>Brain Tumor MRI Detection</h1>
-          <p class="subtitle">ResNet50 features + SVM classification, with a CNN head for Grad-CAM explainability.</p>
-        </div>
-        <div class="badge">Flask • ResNet50 • SVM • Grad-CAM</div>
-      </div>
+    <a class="skip" href="#main">Skip to main content</a>
 
-      <div class="grid">
-        <div class="card">
-          <h2>Upload MRI image</h2>
+    <div class="disclaimer" role="note">
+      <strong>Research prototype.</strong> {{ disclaimer }}
+    </div>
 
-          {% if error %}
-            <div class="error" style="margin-bottom: 10px;">{{ error }}</div>
-          {% endif %}
+    {% set active = "analysis" %}
+    {% include "_site_header.html" %}
 
-          <form id="form" action="/predict" method="post" enctype="multipart/form-data">
-            <div id="drop" class="drop">
-              <div class="fileRow">
-                <div class="fileName" id="fileName">Choose an image (JPG/PNG) or drag & drop here.</div>
+    <main id="main" class="wrap">
+      <div class="layout">
+        <div class="col col-left">
+          <!-- A. Upload + image viewer -->
+          <section class="card card-upload" aria-labelledby="upload-h">
+            <div class="card-head">
+              <h2 id="upload-h"><span class="step">1</span> MRI image</h2>
+              <span class="hint">JPG, JPEG, PNG or BMP · max {{ max_mb }} MB</span>
+            </div>
+
+            <div id="dropTarget" class="drop-target">
+              <input id="file" class="sr-only" type="file" accept="{{ accept }}" aria-label="MRI image file" tabindex="-1" />
+
+              <div id="drop" class="drop" tabindex="0" role="button"
+                   aria-label="Choose an MRI image, or drag and drop one here">
+                <div id="previewEmpty" class="drop-empty">
+                  <svg class="icon icon-xl" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 16V5m0 0l-4 4m4-4l4 4M5 20h14"/></svg>
+                  <div class="drop-title"><b>Click to browse</b> or drag &amp; drop an MRI image</div>
+                  <div class="hint">JPG, JPEG, PNG or BMP · up to {{ max_mb }} MB</div>
+                </div>
               </div>
-              <input id="file" type="file" name="file" accept="image/*" required />
+
+              <div id="viewer" class="viewer" hidden>
+                <div class="viewer-toolbar" role="toolbar" aria-label="Image viewer controls">
+                  <button id="zoomOut" type="button" class="tool" aria-label="Zoom out" title="Zoom out (−)">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6"/></svg>
+                  </button>
+                  <button id="zoomIn" type="button" class="tool" aria-label="Zoom in" title="Zoom in (+)">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/></svg>
+                  </button>
+                  <span id="zoomLabel" class="zoom-label" aria-live="polite">100%</span>
+                  <button id="zoomFit" type="button" class="tool" aria-label="Fit to screen" title="Fit to screen (F)">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M9 10h6v4H9z"/></svg>
+                  </button>
+                  <button id="zoomReset" type="button" class="tool tool-text" aria-label="Reset zoom to 100 percent" title="Reset zoom to 100% (0)">1:1</button>
+                  <button id="fullscreen" type="button" class="tool" aria-label="View fullscreen" title="Fullscreen" aria-pressed="false">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+                  </button>
+                </div>
+                <div id="viewport" class="viewport" tabindex="0"
+                     aria-label="MRI image viewer. Press plus or minus to zoom, 0 for actual size, F to fit.">
+                  <img id="preview" class="preview" alt="Selected MRI image" draggable="false" hidden />
+                </div>
+                <p class="viewer-note">Zoom and pan change only this preview, never the image sent for analysis.</p>
+              </div>
+            </div>
+
+            <div id="fileInfo" class="file-info" hidden>
+              <span id="fileName" class="chip chip-name" aria-live="polite"></span>
+              <span id="fileDims" class="chip"></span>
+              <span id="fileSize" class="chip"></span>
             </div>
 
             <div class="actions">
-              <button id="btn" type="submit">Predict</button>
-              <div class="hint">If you haven’t trained yet, run <code>python train.py</code> to generate <code>artifacts/</code>.</div>
+              <button id="btn" type="button" class="btn btn-primary" disabled>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <span id="btnLabel">Analyse image</span>
+              </button>
+              <button id="clear" type="button" class="btn btn-ghost" hidden>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                Remove image
+              </button>
             </div>
-          </form>
+
+            <div id="error" class="alert alert-error" role="alert" hidden></div>
+          </section>
+
+          <!-- D. Demo samples -->
+          <section class="card card-samples" aria-labelledby="samples-h">
+            <div class="card-head">
+              <h2 id="samples-h">Demo samples</h2>
+              <span class="hint">Validation split</span>
+            </div>
+            <p class="hint">Eight images drawn at random from the approved <b>validation</b> split (two per class). They are
+              demo samples, not test data, and the model may get some of them wrong.</p>
+            <div id="sampleGrid" class="sample-grid" aria-label="Demo samples"></div>
+          </section>
         </div>
 
-        <div class="card">
-          <h2>Results</h2>
-
-          {% if pred_label %}
-            <div class="resultsTop">
-              <div class="pill"><b>Prediction</b> {{ pred_label }}</div>
-              <div class="pill"><b>Confidence</b> {{ confidence }}</div>
+        <div class="col col-right">
+          <!-- E. Prediction results -->
+          <section class="card result-card" aria-labelledby="results-h">
+            <div class="card-head">
+              <h2 id="results-h"><span class="step">2</span> Analysis result</h2>
             </div>
 
-            {% if gradcam_error %}
-              <div class="error" style="margin-top: 12px;">{{ gradcam_error }}</div>
-            {% endif %}
+            <div id="status" aria-live="polite" aria-atomic="true">
+              <div id="empty" class="empty-state">
+                <svg class="icon icon-xl" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <div><b>No analysis yet</b></div>
+                <div class="hint">Choose or drop an MRI image, or pick a demo sample, then press <b>Analyse image</b>.</div>
+              </div>
+              <div id="loading" class="loading" hidden><span class="spinner" aria-hidden="true"></span> Analysing image…</div>
+            </div>
 
-            {% if ranked %}
-              <div class="probList" aria-label="Class probabilities">
-                {% for item in ranked %}
-                  <div class="probItem">
-                    <div class="probHdr">
-                      <div><b>{{ item.label }}</b></div>
-                      <div>{{ (item.prob * 100) | round(2) }}%</div>
-                    </div>
-                    <div class="bar"><div style="width: {{ (item.prob * 100) }}%;"></div></div>
+            <div id="result" hidden>
+              <div class="verdict">
+                <div class="verdict-tag">AI model prediction · not a medical diagnosis</div>
+                <div class="verdict-main">
+                  <div class="verdict-text">
+                    <div class="eyebrow">Predicted category</div>
+                    <div id="rLabel" class="verdict-label"></div>
                   </div>
-                {% endfor %}
-              </div>
-            {% endif %}
-
-            <div class="imgs">
-              <div class="imgbox">
-                <div class="imgcap">Original</div>
-                <img alt="Original" src="data:image/png;base64,{{ original_b64 }}" />
-              </div>
-              {% if gradcam_b64 %}
-                <div class="imgbox">
-                  <div class="imgcap">Grad-CAM overlay</div>
-                  <img alt="Grad-CAM" src="data:image/png;base64,{{ gradcam_b64 }}" />
+                  <div id="gauge" class="gauge" role="img" aria-label="Model confidence">
+                    <div class="gauge-inner">
+                      <span id="rConf" class="gauge-value"></span>
+                      <small>confidence</small>
+                    </div>
+                  </div>
                 </div>
-              {% endif %}
+              </div>
+
+              <div id="rWarn" class="alert" role="status" hidden></div>
+              <div id="rSample" class="sample-note" hidden></div>
+
+              <h3 class="section-title">Class probabilities</h3>
+              <div id="probList" class="prob-list" aria-label="Class probabilities"></div>
+
+              <div class="explain">
+                <div class="explain-title">Explainability (Grad-CAM)</div>
+                <div id="explainText" class="explain-text"></div>
+              </div>
+
+              <div class="export">
+                <span class="eyebrow">Export result</span>
+                <div class="export-btns">
+                  <button id="dlJson" type="button" class="btn btn-secondary">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>
+                    Download JSON
+                  </button>
+                  <button id="dlPng" type="button" class="btn btn-secondary">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>
+                    Download PNG
+                  </button>
+                  <button id="dlPdf" type="button" class="btn btn-secondary">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>
+                    Download PDF
+                  </button>
+                </div>
+                <div class="save-row">
+                  <button id="saveReport" type="button" class="btn btn-primary btn-sm">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>
+                    <span id="saveLabel">Save to Reports</span>
+                  </button>
+                  <a id="viewSaved" class="link" href="{{ url_for('reports_page') }}" hidden>View in Reports</a>
+                </div>
+              </div>
+              <p class="hint note">A model prediction is not a medical diagnosis. Results are for research demonstration only
+                and must be confirmed by qualified professionals.</p>
             </div>
-          {% else %}
-            <div class="hint">Upload an MRI image to see the prediction, class probabilities, and Grad-CAM overlay.</div>
-          {% endif %}
+          </section>
         </div>
       </div>
-    </div>
 
-    <script>
-      (function () {
-        const drop = document.getElementById("drop");
-        const file = document.getElementById("file");
-        const fileName = document.getElementById("fileName");
-        const btn = document.getElementById("btn");
-        const form = document.getElementById("form");
+      <!-- F. About the model -->
+      <section class="card about" aria-labelledby="about-h">
+        <div class="card-head">
+          <h2 id="about-h">About the model</h2>
+          <span class="tag">Validation metrics · not clinical performance</span>
+        </div>
+        <div id="aboutBody" class="about-body hint">Loading…</div>
+      </section>
+    </main>
 
-        function setName(f) {
-          fileName.textContent = f ? f.name : "Choose an image (JPG/PNG) or drag & drop here.";
-        }
+    <!-- H. Footer -->
+    {% include "_site_footer.html" %}
 
-        file.addEventListener("change", () => setName(file.files && file.files[0]));
-
-        ["dragenter", "dragover"].forEach((ev) =>
-          drop.addEventListener(ev, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            drop.classList.add("dragover");
-          })
-        );
-        ["dragleave", "drop"].forEach((ev) =>
-          drop.addEventListener(ev, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            drop.classList.remove("dragover");
-          })
-        );
-        drop.addEventListener("drop", (e) => {
-          const dt = e.dataTransfer;
-          if (dt && dt.files && dt.files.length) {
-            file.files = dt.files;
-            setName(dt.files[0]);
-          }
-        });
-
-        form.addEventListener("submit", () => {
-          btn.disabled = true;
-          btn.textContent = "Predicting…";
-        });
-      })();
-    </script>
+    <script>window.NEUROINSIGHT = { maxBytes: {{ max_mb * 1024 * 1024 }}, allowedExt: {{ accept.replace('.', '').split(',') | tojson }} };</script>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
   </body>
 </html>
-

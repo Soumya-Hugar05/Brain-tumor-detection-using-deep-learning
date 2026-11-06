@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Reports – NeuroInsight (Research Prototype)</title>
+    {% include "_theme_init.html" %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to main content</a>
+
+    <div class="disclaimer" role="note">
+      <strong>Research prototype.</strong> {{ disclaimer }}
+    </div>
+
+    {% set active = "reports" %}
+    {% include "_site_header.html" %}
+
+    <main id="main" class="wrap">
+      <!-- Header: title, search, filter, export -->
+      <section class="page-head">
+        <div>
+          <h1 class="page-title">Reports</h1>
+          <p class="subtitle">Manage and download MRI analysis reports.</p>
+        </div>
+        <div class="page-tools">
+          <div class="search">
+            <label class="sr-only" for="q">Search reports by file name or report ID</label>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="q" type="search" placeholder="Search file name or report ID" maxlength="100" autocomplete="off" />
+          </div>
+          <button id="filterBtn" type="button" class="btn btn-secondary" aria-expanded="false" aria-controls="filters">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg>
+            <span id="filterLabel">Filter</span>
+          </button>
+          <button id="exportBtn" type="button" class="btn btn-secondary">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>
+            Export CSV
+          </button>
+        </div>
+      </section>
+
+      <section id="filters" class="card filters" aria-label="Filters" hidden>
+        <div class="field">
+          <label for="fClass">Predicted class</label>
+          <select id="fClass">
+            <option value="">All classes</option>
+            {% for value, label in classes %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="fFrom">Generated from</label>
+          <input id="fFrom" type="date" />
+        </div>
+        <div class="field">
+          <label for="fTo">Generated to</label>
+          <input id="fTo" type="date" />
+        </div>
+        <div class="field">
+          <label for="fSort">Sort by date</label>
+          <select id="fSort">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fSize">Rows per page</label>
+          <select id="fSize">{% for n in page_sizes %}<option value="{{ n }}">{{ n }}</option>{% endfor %}</select>
+        </div>
+        <div class="field field-end">
+          <button id="clearFilters" type="button" class="btn btn-ghost">Clear filters</button>
+        </div>
+      </section>
+
+      <!-- Report statistics (always real counts from the stored reports) -->
+      <section class="stats" aria-label="Report statistics">
+        <div class="stat"><div class="stat-value" id="statTotal">–</div><div class="stat-label">Total reports</div></div>
+        <div class="stat"><div class="stat-value" id="statToday">–</div><div class="stat-label">Generated today</div></div>
+        <div class="stat"><div class="stat-value" id="statMonth">–</div><div class="stat-label">Generated this month</div></div>
+      </section>
+
+      <!-- Reports table -->
+      <section class="card table-card" aria-labelledby="table-h">
+        <h2 id="table-h" class="sr-only">Report list</h2>
+        <div id="loading" class="loading"><span class="spinner" aria-hidden="true"></span> Loading reports…</div>
+        <div id="errorBox" class="alert alert-error" role="alert" hidden></div>
+
+        <div id="emptyAll" class="empty-state" hidden>
+          <svg class="icon icon-xl" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>
+          <div><b>No reports yet</b></div>
+          <div class="hint">Analyse an MRI image, then press <b>Save to Reports</b> on the result card. Reports keep only the
+            prediction details, never the image.</div>
+          <a class="btn btn-primary" href="{{ url_for('index') }}">Go to MRI analysis</a>
+        </div>
+        <div id="emptyFiltered" class="empty-state" hidden>
+          <svg class="icon icon-xl" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <div><b>No reports match your search or filters</b></div>
+          <button id="emptyClear" type="button" class="btn btn-secondary">Clear search and filters</button>
+        </div>
+
+        <div id="tableWrap" class="table-wrap" hidden>
+          <table class="reports-table">
+            <thead>
+              <tr>
+                <th scope="col">Report ID</th>
+                <th scope="col">Case ID</th>
+                <th scope="col">MRI image</th>
+                <th scope="col">Predicted class</th>
+                <th scope="col" class="num">Confidence</th>
+                <th scope="col" aria-sort="descending" id="dateTh">
+                  <button id="sortDate" type="button" class="th-sort" title="Reverse the date order">Date generated <span id="sortArrow" aria-hidden="true">↓</span></button>
+                </th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+
+        <nav id="pager" class="pagination" aria-label="Pagination" hidden>
+          <span id="pageInfo" class="hint" aria-live="polite"></span>
+          <div class="pager-btns">
+            <button id="prevPage" type="button" class="btn btn-secondary btn-sm">← Previous</button>
+            <span id="pageNum" class="page-num"></span>
+            <button id="nextPage" type="button" class="btn btn-secondary btn-sm">Next →</button>
+          </div>
+        </nav>
+      </section>
+    </main>
+
+    <!-- Report preview -->
+    <dialog id="previewDialog" class="dialog dialog-wide" aria-labelledby="pvTitle">
+      <div class="dialog-bar">
+        <h2 id="pvTitle">Report preview</h2>
+        <button id="pvClose" type="button" class="icon-btn" aria-label="Close preview">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="pvBody" class="dialog-body"></div>
+      <div class="dialog-actions">
+        <button id="pvPdf" type="button" class="btn btn-primary btn-sm">Download PDF</button>
+        <button id="pvJson" type="button" class="btn btn-secondary btn-sm">Download JSON</button>
+        <button id="pvPng" type="button" class="btn btn-secondary btn-sm">Download PNG</button>
+        <button id="pvDelete" type="button" class="btn btn-ghost btn-sm btn-danger">Delete report</button>
+      </div>
+    </dialog>
+
+    <!-- Delete confirmation -->
+    <dialog id="confirmDialog" class="dialog" aria-labelledby="cfTitle" aria-describedby="cfText">
+      <div class="dialog-body">
+        <h2 id="cfTitle">Delete this report?</h2>
+        <p id="cfText" class="hint"></p>
+      </div>
+      <div class="dialog-actions">
+        <button id="cfCancel" type="button" class="btn btn-secondary btn-sm" autofocus>Cancel</button>
+        <button id="cfOk" type="button" class="btn btn-danger btn-sm">Delete</button>
+      </div>
+    </dialog>
+
+    {% include "_site_footer.html" %}
+
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+  </body>
+</html>
