@@ -1,0 +1,36 @@
+{
+  "description": "Phase B selected frozen-feature model (decided on validation only)",
+  "preprocessing": "resize",
+  "flip_average": false,
+  "decision_rule": "argmax_proba",
+  "class_names": [
+    "glioma",
+    "meningioma",
+    "notumor",
+    "pituitary"
+  ],
+  "feature": "ResNet50 (ImageNet, frozen) GAP of conv5_block3_out, 2048-d",
+  "trained_on": "train split of data_splits/manifest.csv",
+  "manifest_sha256": "4d09b01d782fa076890f32bf30bcbbe1a2319c135ead2e58cbd5e1f9ec0d930f",
+  "hyperparameters": {
+    "svc": {
+      "kernel": "rbf",
+      "C": 1.0,
+      "gamma": "scale",
+      "class_weight": "balanced"
+    },
+    "calibration": "SVC built-in Platt (legacy)"
+  },
+  "estimator_sha256": "f15312b456c32391457319d420501df768e44165f855538c696abedf744bb1a8",
+  "decisions": {
+    "preprocessing": "resize",
+    "flip_average": false,
+    "svm_hyperparameters": {
+      "kernel": "rbf",
+      "C": 1.0,
+      "gamma": "scale",
+      "class_weight": "balanced"
+    },
+    "calibration": "SVC built-in Platt (legacy)"
+  }
+}

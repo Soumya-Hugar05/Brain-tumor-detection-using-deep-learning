@@ -1,0 +1,49 @@
+{
+  "split": "val",
+  "n": 1046,
+  "comparisons": [
+    {
+      "compare": "A evaluate-path(cached) vs C app-path",
+      "n": 1046,
+      "features_bitwise_identical": true,
+      "max_abs_feature_diff": 0.0,
+      "max_abs_feature_diff_relative": 0.0,
+      "probabilities_bitwise_identical": true,
+      "max_abs_probability_diff": 0.0,
+      "n_labels_differ": 0
+    },
+    {
+      "compare": "B fresh-batch vs C app-path",
+      "n": 128,
+      "features_bitwise_identical": true,
+      "max_abs_feature_diff": 0.0,
+      "max_abs_feature_diff_relative": 0.0,
+      "probabilities_bitwise_identical": true,
+      "max_abs_probability_diff": 0.0,
+      "n_labels_differ": 0
+    },
+    {
+      "compare": "A evaluate-path(cached) vs B fresh-batch",
+      "n": 128,
+      "features_bitwise_identical": true,
+      "max_abs_feature_diff": 0.0,
+      "max_abs_feature_diff_relative": 0.0,
+      "probabilities_bitwise_identical": true,
+      "max_abs_probability_diff": 0.0,
+      "n_labels_differ": 0
+    }
+  ],
+  "accuracy_evaluate_path": 0.9216061185468452,
+  "accuracy_app_path": 0.9216061185468452,
+  "macro_f1_evaluate_path": 0.9180703436277851,
+  "macro_f1_app_path": 0.9180703436277851,
+  "bundle": {
+    "bundle": "D:\\college\\projects\\projectPhase1\\runs\\20261105-184406_phaseB_frozen_improvements\\models\\improved_svm",
+    "description": "Phase B selected frozen-feature model (decided on validation only)",
+    "preprocessing": "resize",
+    "flip_average": false,
+    "decision_rule": "argmax_proba",
+    "estimator_sha256": "f15312b456c32391457319d420501df768e44165f855538c696abedf744bb1a8",
+    "manifest_sha256": "4d09b01d782fa076890f32bf30bcbbe1a2319c135ead2e58cbd5e1f9ec0d930f"
+  }
+}

@@ -1,0 +1,20 @@
+path,reason,note
+Training/meningioma/Tr-me_409.jpg,label_conflict_copy,"runA g00388: mirror copy of Tr-pi_1309/Tr-pi_261 (corr 0.9998, block p10 0.998)"
+Training/pituitary/Tr-pi_1309.jpg,label_conflict_copy,runA g00388
+Training/pituitary/Tr-pi_261.jpg,label_conflict_copy,runA g00388
+Testing/meningioma/Te-me_115.jpg,label_conflict_copy,"runA g00476: mirror copy of Te-pi_206 (corr 0.9998, block p10 0.993)"
+Testing/pituitary/Te-pi_206.jpg,label_conflict_copy,runA g00476
+Training/meningioma/Tr-me_105.jpg,label_conflict_copy,"runA g02341: mirror copy of 4 pituitary images (corr 0.9998, block p10 0.997)"
+Training/pituitary/Tr-pi_1023.jpg,label_conflict_copy,runA g02341
+Training/pituitary/Tr-pi_1071.jpg,label_conflict_copy,runA g02341
+Training/pituitary/Tr-pi_1207.jpg,label_conflict_copy,runA g02341
+Training/pituitary/Tr-pi_991.jpg,label_conflict_copy,runA g02341
+Training/meningioma/Tr-me_116.jpg,label_conflict_copy,"runA g02424: mirror copy of 2 pituitary images (corr 0.9997, block p10 0.995)"
+Training/pituitary/Tr-pi_1133.jpg,label_conflict_copy,runA g02424
+Training/pituitary/Tr-pi_1320.jpg,label_conflict_copy,runA g02424
+Training/meningioma/Tr-me_533.jpg,label_conflict_copy,"runA g02694: mirror copy of Tr-pi_91 (corr 0.9998, block p10 0.998)"
+Training/pituitary/Tr-pi_91.jpg,label_conflict_copy,runA g02694
+Training/meningioma/Tr-me_964.jpg,label_conflict_copy,"runA g02777: mirror copy of 3 pituitary images (corr 0.9998, block p10 0.998)"
+Training/pituitary/Tr-pi_1098.jpg,label_conflict_copy,runA g02777
+Training/pituitary/Tr-pi_1155.jpg,label_conflict_copy,runA g02777
+Training/pituitary/Tr-pi_1380.jpg,label_conflict_copy,runA g02777

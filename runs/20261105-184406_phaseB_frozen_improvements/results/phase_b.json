@@ -1,0 +1,1516 @@
+{
+  "croppad_fallbacks_train_val": {
+    "glioma": 0,
+    "meningioma": 0,
+    "notumor": 0,
+    "pituitary": 0
+  },
+  "image_properties_by_class_train": {
+    "glioma": {
+      "width": 512.0,
+      "height": 512.0,
+      "aspect": 1.0,
+      "bytes_per_pixel": 0.07442283630371094,
+      "jpeg_quality": 74.81019522776573,
+      "stored_gray": 1.0,
+      "g_mean": 41.50541687011719,
+      "g_p95": 113.29204177856445,
+      "g_laplacian_var": 276.68560791015625,
+      "share_512x512": 0.9626391096979332,
+      "share_square": 0.9666136724960255
+    },
+    "meningioma": {
+      "width": 512.0,
+      "height": 512.0,
+      "aspect": 1.0,
+      "bytes_per_pixel": 0.08910560607910156,
+      "jpeg_quality": 91.97396963123644,
+      "stored_gray": 0.0,
+      "g_mean": 51.22316360473633,
+      "g_p95": 135.9203872680664,
+      "g_laplacian_var": 280.7371826171875,
+      "share_512x512": 0.8303249097472925,
+      "share_square": 0.8501805054151624
+    },
+    "notumor": {
+      "width": 227.0,
+      "height": 243.0,
+      "aspect": 1.0,
+      "bytes_per_pixel": 0.18019779298636532,
+      "jpeg_quality": 74.81019522776573,
+      "stored_gray": 0.0,
+      "g_mean": 61.22249412536621,
+      "g_p95": 167.38074493408203,
+      "g_laplacian_var": 724.2402038574219,
+      "share_512x512": 0.013492063492063493,
+      "share_square": 0.346031746031746
+    },
+    "pituitary": {
+      "width": 512.0,
+      "height": 512.0,
+      "aspect": 1.0,
+      "bytes_per_pixel": 0.10862350463867188,
+      "jpeg_quality": 74.81019522776573,
+      "stored_gray": 1.0,
+      "g_mean": 51.16215515136719,
+      "g_p95": 123.10838317871094,
+      "g_laplacian_var": 396.943359375,
+      "share_512x512": 0.9552358113509193,
+      "share_square": 0.982414068745004
+    }
+  },
+  "shortcut_probes": {
+    "geometry (original size/aspect)": {
+      "features": [
+        "width",
+        "height",
+        "aspect",
+        "log_pixels"
+      ],
+      "val_accuracy": 0.5162523900573613,
+      "val_macro_f1": 0.40702846751854566,
+      "val_notumor_auc": 0.9731242840778924,
+      "chance_accuracy": 0.25812619502868067
+    },
+    "encoding (bytes/px, JPEG quality, colour mode)": {
+      "features": [
+        "bytes_per_pixel",
+        "jpeg_quality",
+        "n_quant_tables",
+        "stored_gray",
+        "is_jpeg",
+        "colour_diff"
+      ],
+      "val_accuracy": 0.6988527724665392,
+      "val_macro_f1": 0.6776661267583008,
+      "val_notumor_auc": 0.9836387934326078,
+      "chance_accuracy": 0.25812619502868067
+    },
+    "geometry + encoding": {
+      "features": [
+        "width",
+        "height",
+        "aspect",
+        "log_pixels",
+        "bytes_per_pixel",
+        "jpeg_quality",
+        "n_quant_tables",
+        "stored_gray",
+        "is_jpeg",
+        "colour_diff"
+      ],
+      "val_accuracy": 0.719885277246654,
+      "val_macro_f1": 0.6997585796224388,
+      "val_notumor_auc": 0.9942129629629629,
+      "chance_accuracy": 0.25812619502868067
+    },
+    "crop geometry after crop+pad": {
+      "features": [
+        "crop_aspect",
+        "crop_area_frac"
+      ],
+      "val_accuracy": 0.5879541108986616,
+      "val_macro_f1": 0.5762130132324537,
+      "val_notumor_auc": 0.8826699121802214,
+      "chance_accuracy": 0.25812619502868067
+    },
+    "intensity statistics of crop+pad image": {
+      "features": [
+        "g_mean",
+        "g_std",
+        "g_p5",
+        "g_p25",
+        "g_p50",
+        "g_p75",
+        "g_p95",
+        "g_p99",
+        "g_black",
+        "g_entropy",
+        "g_laplacian_var"
+      ],
+      "val_accuracy": 0.8307839388145315,
+      "val_macro_f1": 0.8264179778933104,
+      "val_notumor_auc": 0.9928837342497135,
+      "chance_accuracy": 0.25812619502868067
+    }
+  },
+  "default_svm_feature_configs": [
+    {
+      "config": "resize",
+      "val_accuracy": 0.9168260038240917,
+      "val_macro_f1": 0.9138506761453842,
+      "tumor_sens": 0.9871134020618557,
+      "tumor_spec": 0.9925925925925926,
+      "per_class_f1": {
+        "glioma": 0.8957528957528957,
+        "meningioma": 0.8291666666666666,
+        "notumor": 0.9781021897810218,
+        "pituitary": 0.9523809523809524
+      },
+      "report": {
+        "n": 1046,
+        "accuracy": 0.9168260038240917,
+        "macro_precision": 0.9142696240235219,
+        "macro_recall": 0.9145338898411769,
+        "macro_f1": 0.9138506761453842,
+        "macro_specificity": 0.9725351941980035,
+        "per_class": {
+          "glioma": {
+            "support": 270,
+            "precision": 0.9354838709677419,
+            "recall": 0.8592592592592593,
+            "f1": 0.8957528957528957,
+            "sensitivity": 0.8592592592592593,
+            "specificity": 0.979381443298969
+          },
+          "meningioma": {
+            "support": 238,
+            "precision": 0.8223140495867769,
+            "recall": 0.8361344537815126,
+            "f1": 0.8291666666666666,
+            "sensitivity": 0.8361344537815126,
+            "specificity": 0.9467821782178217
+          },
+          "notumor": {
+            "support": 270,
+            "precision": 0.9640287769784173,
+            "recall": 0.9925925925925926,
+            "f1": 0.9781021897810218,
+            "sensitivity": 0.9925925925925926,
+            "specificity": 0.9871134020618557
+          },
+          "pituitary": {
+            "support": 268,
+            "precision": 0.935251798561151,
+            "recall": 0.9701492537313433,
+            "f1": 0.9523809523809524,
+            "sensitivity": 0.9701492537313433,
+            "specificity": 0.9768637532133676
+          }
+        },
+        "tumor_vs_notumor": {
+          "sensitivity": 0.9871134020618557,
+          "specificity": 0.9925925925925926,
+          "tp": 766,
+          "fn": 10,
+          "fp": 2,
+          "tn": 268
+        },
+        "confusion_matrix": [
+          [
+            232,
+            36,
+            1,
+            1
+          ],
+          [
+            14,
+            199,
+            8,
+            17
+          ],
+          [
+            0,
+            2,
+            268,
+            0
+          ],
+          [
+            2,
+            5,
+            1,
+            260
+          ]
+        ]
+      }
+    },
+    {
+      "config": "resize+flipavg",
+      "val_accuracy": 0.9130019120458891,
+      "val_macro_f1": 0.9095818502970128,
+      "tumor_sens": 0.9858247422680413,
+      "tumor_spec": 0.9925925925925926,
+      "per_class_f1": {
+        "glioma": 0.8893129770992367,
+        "meningioma": 0.818565400843882,
+        "notumor": 0.9763205828779599,
+        "pituitary": 0.9541284403669725
+      },
+      "report": {
+        "n": 1046,
+        "accuracy": 0.9130019120458891,
+        "macro_precision": 0.9096395921245071,
+        "macro_recall": 0.9102077149267667,
+        "macro_f1": 0.9095818502970128,
+        "macro_specificity": 0.9712329472088014,
+        "per_class": {
+          "glioma": {
+            "support": 270,
+            "precision": 0.9173228346456693,
+            "recall": 0.8629629629629629,
+            "f1": 0.8893129770992367,
+            "sensitivity": 0.8629629629629629,
+            "specificity": 0.9729381443298969
+          },
+          "meningioma": {
+            "support": 238,
+            "precision": 0.8220338983050848,
+            "recall": 0.8151260504201681,
+            "f1": 0.818565400843882,
+            "sensitivity": 0.8151260504201681,
+            "specificity": 0.948019801980198
+          },
+          "notumor": {
+            "support": 270,
+            "precision": 0.9605734767025089,
+            "recall": 0.9925925925925926,
+            "f1": 0.9763205828779599,
+            "sensitivity": 0.9925925925925926,
+            "specificity": 0.9858247422680413
+          },
+          "pituitary": {
+            "support": 268,
+            "precision": 0.9386281588447654,
+            "recall": 0.9701492537313433,
+            "f1": 0.9541284403669725,
+            "sensitivity": 0.9701492537313433,
+            "specificity": 0.9781491002570694
+          }
+        },
+        "tumor_vs_notumor": {
+          "sensitivity": 0.9858247422680413,
+          "specificity": 0.9925925925925926,
+          "tp": 765,
+          "fn": 11,
+          "fp": 2,
+          "tn": 268
+        },
+        "confusion_matrix": [
+          [
+            233,
+            35,
+            1,
+            1
+          ],
+          [
+            19,
+            194,
+            9,
+            16
+          ],
+          [
+            0,
+            2,
+            268,
+            0
+          ],
+          [
+            2,
+            5,
+            1,
+            260
+          ]
+        ]
+      }
+    },
+    {
+      "config": "croppad",
+      "val_accuracy": 0.9034416826003824,
+      "val_macro_f1": 0.8999333344811258,
+      "tumor_sens": 0.9961340206185567,
+      "tumor_spec": 0.9925925925925926,
+      "per_class_f1": {
+        "glioma": 0.8738229755178908,
+        "meningioma": 0.8025477707006369,
+        "notumor": 0.9907578558225508,
+        "pituitary": 0.9326047358834245
+      },
+      "report": {
+        "n": 1046,
+        "accuracy": 0.9034416826003824,
+        "macro_precision": 0.9000024012351986,
+        "macro_recall": 0.9002983448769226,
+        "macro_f1": 0.8999333344811258,
+        "macro_specificity": 0.9680434412402097,
+        "per_class": {
+          "glioma": {
+            "support": 270,
+            "precision": 0.8888888888888888,
+            "recall": 0.8592592592592593,
+            "f1": 0.8738229755178908,
+            "sensitivity": 0.8592592592592593,
+            "specificity": 0.9626288659793815
+          },
+          "meningioma": {
+            "support": 238,
+            "precision": 0.8111587982832618,
+            "recall": 0.7941176470588235,
+            "f1": 0.8025477707006369,
+            "sensitivity": 0.7941176470588235,
+            "specificity": 0.9455445544554455
+          },
+          "notumor": {
+            "support": 270,
+            "precision": 0.988929889298893,
+            "recall": 0.9925925925925926,
+            "f1": 0.9907578558225508,
+            "sensitivity": 0.9925925925925926,
+            "specificity": 0.9961340206185567
+          },
+          "pituitary": {
+            "support": 268,
+            "precision": 0.9110320284697508,
+            "recall": 0.9552238805970149,
+            "f1": 0.9326047358834245,
+            "sensitivity": 0.9552238805970149,
+            "specificity": 0.967866323907455
+          }
+        },
+        "tumor_vs_notumor": {
+          "sensitivity": 0.9961340206185567,
+          "specificity": 0.9925925925925926,
+          "tp": 773,
+          "fn": 3,
+          "fp": 2,
+          "tn": 268
+        },
+        "confusion_matrix": [
+          [
+            232,
+            35,
+            0,
+            3
+          ],
+          [
+            25,
+            189,
+            2,
+            22
+          ],
+          [
+            0,
+            2,
+            268,
+            0
+          ],
+          [
+            4,
+            7,
+            1,
+            256
+          ]
+        ]
+      }
+    },
+    {
+      "config": "croppad+flipavg",
+      "val_accuracy": 0.9053537284894837,
+      "val_macro_f1": 0.9019501086341493,
+      "tumor_sens": 0.9922680412371134,
+      "tumor_spec": 0.9888888888888889,
+      "per_class_f1": {
+        "glioma": 0.8764044943820225,
+        "meningioma": 0.8067940552016986,
+        "notumor": 0.9834254143646408,
+        "pituitary": 0.9411764705882353
+      },
+      "report": {
+        "n": 1046,
+        "accuracy": 0.9053537284894837,
+        "macro_precision": 0.9018431225116241,
+        "macro_recall": 0.9022746909709158,
+        "macro_f1": 0.9019501086341493,
+        "macro_specificity": 0.9686708711916165,
+        "per_class": {
+          "glioma": {
+            "support": 270,
+            "precision": 0.8863636363636364,
+            "recall": 0.8666666666666667,
+            "f1": 0.8764044943820225,
+            "sensitivity": 0.8666666666666667,
+            "specificity": 0.961340206185567
+          },
+          "meningioma": {
+            "support": 238,
+            "precision": 0.8154506437768241,
+            "recall": 0.7983193277310925,
+            "f1": 0.8067940552016986,
+            "sensitivity": 0.7983193277310925,
+            "specificity": 0.9467821782178217
+          },
+          "notumor": {
+            "support": 270,
+            "precision": 0.978021978021978,
+            "recall": 0.9888888888888889,
+            "f1": 0.9834254143646408,
+            "sensitivity": 0.9888888888888889,
+            "specificity": 0.9922680412371134
+          },
+          "pituitary": {
+            "support": 268,
+            "precision": 0.927536231884058,
+            "recall": 0.9552238805970149,
+            "f1": 0.9411764705882353,
+            "sensitivity": 0.9552238805970149,
+            "specificity": 0.974293059125964
+          }
+        },
+        "tumor_vs_notumor": {
+          "sensitivity": 0.9922680412371134,
+          "specificity": 0.9888888888888889,
+          "tp": 770,
+          "fn": 6,
+          "fp": 3,
+          "tn": 267
+        },
+        "confusion_matrix": [
+          [
+            234,
+            33,
+            1,
+            2
+          ],
+          [
+            26,
+            190,
+            4,
+            18
+          ],
+          [
+            0,
+            3,
+            267,
+            0
+          ],
+          [
+            4,
+            7,
+            1,
+            256
+          ]
+        ]
+      }
+    }
+  ],
+  "perturbation_test": {
+    "jpeg_quality_notumor_median": 74.81019522776573,
+    "jpeg_quality_tumor_median": 74.81019522776573,
+    "conditions": {
+      "tumor -> no-tumor-like (225x225, notumor JPEG quality)": {
+        "n": 776,
+        "resize": {
+          "accuracy_before": 0.8904639175257731,
+          "accuracy_after": 0.8608247422680413,
+          "shortcut_flip_rate": 0.006527415143603133,
+          "any_prediction_changed": 0.08891752577319588
+        },
+        "resize+flipavg": {
+          "accuracy_before": 0.8853092783505154,
+          "accuracy_after": 0.8530927835051546,
+          "shortcut_flip_rate": 0.00261437908496732,
+          "any_prediction_changed": 0.09278350515463918
+        },
+        "croppad": {
+          "accuracy_before": 0.8724226804123711,
+          "accuracy_after": 0.8724226804123711,
+          "shortcut_flip_rate": 0.007761966364812419,
+          "any_prediction_changed": 0.07731958762886598
+        },
+        "croppad+flipavg": {
+          "accuracy_before": 0.8762886597938144,
+          "accuracy_after": 0.8762886597938144,
+          "shortcut_flip_rate": 0.006493506493506494,
+          "any_prediction_changed": 0.07603092783505154
+        }
+      },
+      "tumor -> JPEG only (original size, notumor JPEG quality)": {
+        "n": 776,
+        "resize": {
+          "accuracy_before": 0.8904639175257731,
+          "accuracy_after": 0.8904639175257731,
+          "shortcut_flip_rate": 0.0,
+          "any_prediction_changed": 0.007731958762886598
+        },
+        "resize+flipavg": {
+          "accuracy_before": 0.8853092783505154,
+          "accuracy_after": 0.8853092783505154,
+          "shortcut_flip_rate": 0.0,
+          "any_prediction_changed": 0.007731958762886598
+        },
+        "croppad": {
+          "accuracy_before": 0.8724226804123711,
+          "accuracy_after": 0.8672680412371134,
+          "shortcut_flip_rate": 0.00258732212160414,
+          "any_prediction_changed": 0.01288659793814433
+        },
+        "croppad+flipavg": {
+          "accuracy_before": 0.8762886597938144,
+          "accuracy_after": 0.8788659793814433,
+          "shortcut_flip_rate": 0.0,
+          "any_prediction_changed": 0.002577319587628866
+        }
+      },
+      "no-tumor -> tumor-like (512x512, tumor JPEG quality)": {
+        "n": 270,
+        "resize": {
+          "accuracy_before": 0.9925925925925926,
+          "accuracy_after": 0.9888888888888889,
+          "shortcut_flip_rate": 0.0037313432835820895,
+          "any_prediction_changed": 0.003703703703703704
+        },
+        "resize+flipavg": {
+          "accuracy_before": 0.9925925925925926,
+          "accuracy_after": 0.9925925925925926,
+          "shortcut_flip_rate": 0.0,
+          "any_prediction_changed": 0.0
+        },
+        "croppad": {
+          "accuracy_before": 0.9925925925925926,
+          "accuracy_after": 0.9888888888888889,
+          "shortcut_flip_rate": 0.0037313432835820895,
+          "any_prediction_changed": 0.003703703703703704
+        },
+        "croppad+flipavg": {
+          "accuracy_before": 0.9888888888888889,
+          "accuracy_after": 0.9925925925925926,
+          "shortcut_flip_rate": 0.0,
+          "any_prediction_changed": 0.003703703703703704
+        }
+      },
+      "no-tumor -> JPEG only (original size, tumor JPEG quality)": {
+        "n": 270,
+        "resize": {
+          "accuracy_before": 0.9925925925925926,
+          "accuracy_after": 0.9888888888888889,
+          "shortcut_flip_rate": 0.0037313432835820895,
+          "any_prediction_changed": 0.003703703703703704
+        },
+        "resize+flipavg": {
+          "accuracy_before": 0.9925925925925926,
+          "accuracy_after": 0.9925925925925926,
+          "shortcut_flip_rate": 0.0,
+          "any_prediction_changed": 0.0
+        },
+        "croppad": {
+          "accuracy_before": 0.9925925925925926,
+          "accuracy_after": 0.9925925925925926,
+          "shortcut_flip_rate": 0.0,
+          "any_prediction_changed": 0.0
+        },
+        "croppad+flipavg": {
+          "accuracy_before": 0.9888888888888889,
+          "accuracy_after": 0.9888888888888889,
+          "shortcut_flip_rate": 0.0,
+          "any_prediction_changed": 0.0
+        }
+      }
+    }
+  },
+  "decisions": {
+    "preprocessing": {
+      "comparison": "croppad vs resize (plain features, default SVM)",
+      "bootstrap": {
+        "macro_f1": {
+          "diff": -0.013917341664258398,
+          "ci95": [
+            -0.032493497468917554,
+            0.003941157223316836
+          ],
+          "significant_gain": false,
+          "significant_loss": false
+        },
+        "accuracy": {
+          "diff": -0.013384321223709361,
+          "ci95": [
+            -0.030940182774854545,
+            0.003155327613574692
+          ],
+          "significant_gain": false,
+          "significant_loss": false
+        },
+        "n_changed_predictions": 57
+      },
+      "mean_shortcut_flip_rate": {
+        "resize": 0.005129379213592611,
+        "croppad": 0.005746654824197254
+      },
+      "rule": "keep croppad if not significantly worse on VAL macro-F1 AND lower shortcut flip rate",
+      "selected": "resize"
+    },
+    "flip_average": {
+      "comparison": "resize+flipavg vs resize",
+      "bootstrap": {
+        "macro_f1": {
+          "diff": -0.004268825848371405,
+          "ci95": [
+            -0.014152747314077802,
+            0.004093574376682647
+          ],
+          "significant_gain": false,
+          "significant_loss": false
+        },
+        "accuracy": {
+          "diff": -0.003824091778202643,
+          "ci95": [
+            -0.012774576606378782,
+            0.003980998621351073
+          ],
+          "significant_gain": false,
+          "significant_loss": false
+        },
+        "n_changed_predictions": 18
+      },
+      "rule": "keep only with a significant VAL macro-F1 gain",
+      "selected": false
+    },
+    "svm_hyperparameters": {
+      "comparison": "best grid point vs default SVM on resize",
+      "best": {
+        "params": {
+          "kernel": "linear",
+          "C": 0.0003,
+          "class_weight": "balanced"
+        },
+        "val_macro_f1": 0.9016354477161852,
+        "val_accuracy": 0.904397705544933,
+        "n_support": 1893,
+        "fit_seconds": 31.8
+      },
+      "bootstrap": {
+        "macro_f1": {
+          "diff": -0.012215228429198977,
+          "ci95": [
+            -0.023424069491849914,
+            -0.0007971750541820243
+          ],
+          "significant_gain": false,
+          "significant_loss": true
+        },
+        "accuracy": {
+          "diff": -0.0124282982791587,
+          "ci95": [
+            -0.02342544467544466,
+            -0.0017792804181968134
+          ],
+          "significant_gain": false,
+          "significant_loss": true
+        },
+        "n_changed_predictions": 29
+      },
+      "train_grouped_cv_macro_f1": {
+        "default": [
+          0.9219147917322772,
+          0.9036497043143814,
+          0.9051879269125683,
+          0.8874005859718159,
+          0.8884309601046737
+        ],
+        "best": [
+          0.9180658742588488,
+          0.8912077053435503,
+          0.898736984280688,
+          0.8873150888612783,
+          0.8901522721675877
+        ],
+        "default_mean": 0.9013167938071434,
+        "best_mean": 0.8970955849823907
+      },
+      "rule": "keep only with a significant VAL gain AND a higher grouped-CV macro-F1 on TRAIN",
+      "selected": {
+        "kernel": "rbf",
+        "C": 1.0,
+        "gamma": "scale",
+        "class_weight": "balanced"
+      }
+    },
+    "calibration": {
+      "results": {
+        "SVC built-in Platt (legacy)": {
+          "nll": 0.21565322841743437,
+          "brier": 0.12150192736324254,
+          "ece": 0.024348156791111235,
+          "mean_confidence": 0.924954855948687,
+          "bins": [
+            {
+              "lo": 0.3333333333333333,
+              "hi": 0.4,
+              "n": 2,
+              "accuracy": 0.0,
+              "confidence": 0.3882128710968034
+            },
+            {
+              "lo": 0.4,
+              "hi": 0.4666666666666667,
+              "n": 7,
+              "accuracy": 0.7142857142857143,
+              "confidence": 0.45158619180185294
+            },
+            {
+              "lo": 0.4666666666666667,
+              "hi": 0.5333333333333333,
+              "n": 21,
+              "accuracy": 0.6666666666666666,
+              "confidence": 0.5015588885901602
+            },
+            {
+              "lo": 0.5333333333333333,
+              "hi": 0.6,
+              "n": 26,
+              "accuracy": 0.5384615384615384,
+              "confidence": 0.5726163201867525
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.6666666666666666,
+              "n": 22,
+              "accuracy": 0.8636363636363636,
+              "confidence": 0.6272271739709158
+            },
+            {
+              "lo": 0.6666666666666666,
+              "hi": 0.7333333333333333,
+              "n": 37,
+              "accuracy": 0.5405405405405406,
+              "confidence": 0.6953371095916846
+            },
+            {
+              "lo": 0.7333333333333333,
+              "hi": 0.8,
+              "n": 32,
+              "accuracy": 0.78125,
+              "confidence": 0.766389557157676
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.8666666666666667,
+              "n": 46,
+              "accuracy": 0.8043478260869565,
+              "confidence": 0.8370374431784162
+            },
+            {
+              "lo": 0.8666666666666667,
+              "hi": 0.9333333333333333,
+              "n": 90,
+              "accuracy": 0.8666666666666667,
+              "confidence": 0.9030391853424089
+            },
+            {
+              "lo": 0.9333333333333333,
+              "hi": 1.0,
+              "n": 763,
+              "accuracy": 0.9855832241153342,
+              "confidence": 0.9886190084848611
+            }
+          ],
+          "accuracy_argmax_proba": 0.9216061185468452,
+          "macro_f1_argmax_proba": 0.9180703436277851,
+          "agreement_with_svm_predict": 0.9694072657743786
+        },
+        "grouped-CV sigmoid": {
+          "nll": 0.30880304644185835,
+          "brier": 0.15089497735769472,
+          "ece": 0.04722020542473217,
+          "mean_confidence": 0.8981584079098051,
+          "bins": [
+            {
+              "lo": 0.6,
+              "hi": 0.6666666666666666,
+              "n": 1,
+              "accuracy": 0.0,
+              "confidence": 0.6640804648131755
+            },
+            {
+              "lo": 0.6666666666666666,
+              "hi": 0.7333333333333333,
+              "n": 52,
+              "accuracy": 0.8269230769230769,
+              "confidence": 0.701440505044445
+            },
+            {
+              "lo": 0.7333333333333333,
+              "hi": 0.8,
+              "n": 112,
+              "accuracy": 0.7410714285714286,
+              "confidence": 0.7768443233320453
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.8666666666666667,
+              "n": 116,
+              "accuracy": 0.9655172413793104,
+              "confidence": 0.8308503753725249
+            },
+            {
+              "lo": 0.8666666666666667,
+              "hi": 0.9333333333333333,
+              "n": 256,
+              "accuracy": 0.87890625,
+              "confidence": 0.9189936331873464
+            },
+            {
+              "lo": 0.9333333333333333,
+              "hi": 1.0,
+              "n": 509,
+              "accuracy": 0.9744597249508841,
+              "confidence": 0.9502694107940453
+            }
+          ],
+          "accuracy_argmax_proba": 0.9168260038240917,
+          "macro_f1_argmax_proba": 0.9138506761453842,
+          "agreement_with_svm_predict": 1.0
+        },
+        "grouped-CV isotonic": {
+          "nll": 0.25911261784569906,
+          "brier": 0.133986085163146,
+          "ece": 0.03500574173934426,
+          "mean_confidence": 0.9093814575447955,
+          "bins": [
+            {
+              "lo": 0.5333333333333333,
+              "hi": 0.6,
+              "n": 4,
+              "accuracy": 0.25,
+              "confidence": 0.570091696965348
+            },
+            {
+              "lo": 0.6,
+              "hi": 0.6666666666666666,
+              "n": 15,
+              "accuracy": 0.4666666666666667,
+              "confidence": 0.6422322567414062
+            },
+            {
+              "lo": 0.6666666666666666,
+              "hi": 0.7333333333333333,
+              "n": 37,
+              "accuracy": 0.8378378378378378,
+              "confidence": 0.7050167990423701
+            },
+            {
+              "lo": 0.7333333333333333,
+              "hi": 0.8,
+              "n": 98,
+              "accuracy": 0.6836734693877551,
+              "confidence": 0.7720812170275178
+            },
+            {
+              "lo": 0.8,
+              "hi": 0.8666666666666667,
+              "n": 77,
+              "accuracy": 0.8051948051948052,
+              "confidence": 0.8290479911418944
+            },
+            {
+              "lo": 0.8666666666666667,
+              "hi": 0.9333333333333333,
+              "n": 213,
+              "accuracy": 0.9154929577464789,
+              "confidence": 0.9087146923259647
+            },
+            {
+              "lo": 0.9333333333333333,
+              "hi": 1.0,
+              "n": 602,
+              "accuracy": 0.9900332225913622,
+              "confidence": 0.9637153626848054
+            }
+          ],
+          "accuracy_argmax_proba": 0.9168260038240917,
+          "macro_f1_argmax_proba": 0.9138506761453842,
+          "agreement_with_svm_predict": 1.0
+        }
+      },
+      "rule": "keep the method with the lowest VAL NLL (legacy unless improved)",
+      "selected": "SVC built-in Platt (legacy)"
+    }
+  },
+  "svm_grid": {
+    "feature_config": "resize",
+    "gamma_scale": 0.00048828125,
+    "results": [
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 0.3,
+          "gamma": 0.0001220703125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.25
+        },
+        "val_macro_f1": 0.871932177699179,
+        "val_accuracy": 0.875717017208413,
+        "n_support": 2788,
+        "fit_seconds": 60.6
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 0.3,
+          "gamma": 0.000244140625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.5
+        },
+        "val_macro_f1": 0.8773624424291565,
+        "val_accuracy": 0.8804971319311663,
+        "n_support": 2659,
+        "fit_seconds": 57.0
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 0.3,
+          "gamma": 0.00048828125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 1.0
+        },
+        "val_macro_f1": 0.8813245683080965,
+        "val_accuracy": 0.8833652007648184,
+        "n_support": 2783,
+        "fit_seconds": 62.5
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 0.3,
+          "gamma": 0.0009765625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 2.0
+        },
+        "val_macro_f1": 0.842346684558937,
+        "val_accuracy": 0.8413001912045889,
+        "n_support": 3324,
+        "fit_seconds": 84.3
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 1.0,
+          "gamma": 0.0001220703125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.25
+        },
+        "val_macro_f1": 0.895583791704908,
+        "val_accuracy": 0.8986615678776291,
+        "n_support": 2164,
+        "fit_seconds": 41.0
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 1.0,
+          "gamma": 0.000244140625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.5
+        },
+        "val_macro_f1": 0.9052074098251189,
+        "val_accuracy": 0.9082217973231358,
+        "n_support": 2191,
+        "fit_seconds": 41.5
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 1.0,
+          "gamma": 0.00048828125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 1.0
+        },
+        "val_macro_f1": 0.9138506761453842,
+        "val_accuracy": 0.9168260038240917,
+        "n_support": 2496,
+        "fit_seconds": 50.3
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 1.0,
+          "gamma": 0.0009765625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 2.0
+        },
+        "val_macro_f1": 0.9007787208971096,
+        "val_accuracy": 0.9024856596558317,
+        "n_support": 3107,
+        "fit_seconds": 89.6
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 3.0,
+          "gamma": 0.0001220703125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.25
+        },
+        "val_macro_f1": 0.9216385734094854,
+        "val_accuracy": 0.9244741873804971,
+        "n_support": 1899,
+        "fit_seconds": 40.9
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 3.0,
+          "gamma": 0.000244140625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.5
+        },
+        "val_macro_f1": 0.9283114886413686,
+        "val_accuracy": 0.9311663479923518,
+        "n_support": 2107,
+        "fit_seconds": 46.3
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 3.0,
+          "gamma": 0.00048828125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 1.0
+        },
+        "val_macro_f1": 0.9325232455083388,
+        "val_accuracy": 0.9349904397705545,
+        "n_support": 2540,
+        "fit_seconds": 63.6
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 3.0,
+          "gamma": 0.0009765625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 2.0
+        },
+        "val_macro_f1": 0.9225828141423065,
+        "val_accuracy": 0.9244741873804971,
+        "n_support": 3128,
+        "fit_seconds": 82.3
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 10.0,
+          "gamma": 0.0001220703125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.25
+        },
+        "val_macro_f1": 0.9263865122811712,
+        "val_accuracy": 0.9292543021032504,
+        "n_support": 1855,
+        "fit_seconds": 32.5
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 10.0,
+          "gamma": 0.000244140625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.5
+        },
+        "val_macro_f1": 0.930319556276982,
+        "val_accuracy": 0.9330783938814532,
+        "n_support": 2136,
+        "fit_seconds": 39.6
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 10.0,
+          "gamma": 0.00048828125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 1.0
+        },
+        "val_macro_f1": 0.9305961149181811,
+        "val_accuracy": 0.9330783938814532,
+        "n_support": 2552,
+        "fit_seconds": 56.2
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 10.0,
+          "gamma": 0.0009765625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 2.0
+        },
+        "val_macro_f1": 0.9225828141423065,
+        "val_accuracy": 0.9244741873804971,
+        "n_support": 3126,
+        "fit_seconds": 81.0
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 30.0,
+          "gamma": 0.0001220703125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.25
+        },
+        "val_macro_f1": 0.9217049323466407,
+        "val_accuracy": 0.9244741873804971,
+        "n_support": 1862,
+        "fit_seconds": 31.3
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 30.0,
+          "gamma": 0.000244140625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 0.5
+        },
+        "val_macro_f1": 0.930394100131263,
+        "val_accuracy": 0.9330783938814532,
+        "n_support": 2136,
+        "fit_seconds": 36.4
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 30.0,
+          "gamma": 0.00048828125,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 1.0
+        },
+        "val_macro_f1": 0.9305961149181811,
+        "val_accuracy": 0.9330783938814532,
+        "n_support": 2552,
+        "fit_seconds": 54.3
+      },
+      {
+        "params": {
+          "kernel": "rbf",
+          "C": 30.0,
+          "gamma": 0.0009765625,
+          "class_weight": "balanced",
+          "gamma_mult_of_scale": 2.0
+        },
+        "val_macro_f1": 0.9225828141423065,
+        "val_accuracy": 0.9244741873804971,
+        "n_support": 3126,
+        "fit_seconds": 79.5
+      },
+      {
+        "params": {
+          "kernel": "linear",
+          "C": 0.0001,
+          "class_weight": "balanced"
+        },
+        "val_macro_f1": 0.8889571282608935,
+        "val_accuracy": 0.8919694072657743,
+        "n_support": 2382,
+        "fit_seconds": 43.4
+      },
+      {
+        "params": {
+          "kernel": "linear",
+          "C": 0.0003,
+          "class_weight": "balanced"
+        },
+        "val_macro_f1": 0.9016354477161852,
+        "val_accuracy": 0.904397705544933,
+        "n_support": 1893,
+        "fit_seconds": 31.8
+      },
+      {
+        "params": {
+          "kernel": "linear",
+          "C": 0.001,
+          "class_weight": "balanced"
+        },
+        "val_macro_f1": 0.9121066135320273,
+        "val_accuracy": 0.9149139579349904,
+        "n_support": 1621,
+        "fit_seconds": 29.0
+      },
+      {
+        "params": {
+          "kernel": "linear",
+          "C": 0.003,
+          "class_weight": "balanced"
+        },
+        "val_macro_f1": 0.9126724768406986,
+        "val_accuracy": 0.9158699808795411,
+        "n_support": 1525,
+        "fit_seconds": 26.6
+      },
+      {
+        "params": {
+          "kernel": "linear",
+          "C": 0.01,
+          "class_weight": "balanced"
+        },
+        "val_macro_f1": 0.9068052706629346,
+        "val_accuracy": 0.9101338432122371,
+        "n_support": 1503,
+        "fit_seconds": 22.9
+      }
+    ]
+  },
+  "selected_model": {
+    "bundle": {
+      "description": "Phase B selected frozen-feature model (decided on validation only)",
+      "preprocessing": "resize",
+      "flip_average": false,
+      "decision_rule": "argmax_proba",
+      "class_names": [
+        "glioma",
+        "meningioma",
+        "notumor",
+        "pituitary"
+      ],
+      "feature": "ResNet50 (ImageNet, frozen) GAP of conv5_block3_out, 2048-d",
+      "trained_on": "train split of data_splits/manifest.csv",
+      "manifest_sha256": "4d09b01d782fa076890f32bf30bcbbe1a2319c135ead2e58cbd5e1f9ec0d930f",
+      "hyperparameters": {
+        "svc": {
+          "kernel": "rbf",
+          "C": 1.0,
+          "gamma": "scale",
+          "class_weight": "balanced"
+        },
+        "calibration": "SVC built-in Platt (legacy)"
+      },
+      "estimator_sha256": "f15312b456c32391457319d420501df768e44165f855538c696abedf744bb1a8",
+      "decisions": {
+        "preprocessing": "resize",
+        "flip_average": false,
+        "svm_hyperparameters": {
+          "kernel": "rbf",
+          "C": 1.0,
+          "gamma": "scale",
+          "class_weight": "balanced"
+        },
+        "calibration": "SVC built-in Platt (legacy)"
+      }
+    },
+    "val": {
+      "n": 1046,
+      "accuracy": 0.9216061185468452,
+      "macro_precision": 0.9194695568042834,
+      "macro_recall": 0.9180361613965652,
+      "macro_f1": 0.9180703436277851,
+      "macro_specificity": 0.9739155286112715,
+      "per_class": {
+        "glioma": {
+          "support": 270,
+          "precision": 0.8989169675090253,
+          "recall": 0.9222222222222223,
+          "f1": 0.9104204753199269,
+          "sensitivity": 0.9222222222222223,
+          "specificity": 0.9639175257731959
+        },
+        "meningioma": {
+          "support": 238,
+          "precision": 0.8837209302325582,
+          "recall": 0.7983193277310925,
+          "f1": 0.8388520971302429,
+          "sensitivity": 0.7983193277310925,
+          "specificity": 0.969059405940594
+        },
+        "notumor": {
+          "support": 270,
+          "precision": 0.9568345323741008,
+          "recall": 0.9851851851851852,
+          "f1": 0.9708029197080292,
+          "sensitivity": 0.9851851851851852,
+          "specificity": 0.9845360824742269
+        },
+        "pituitary": {
+          "support": 268,
+          "precision": 0.9384057971014492,
+          "recall": 0.9664179104477612,
+          "f1": 0.9522058823529411,
+          "sensitivity": 0.9664179104477612,
+          "specificity": 0.9781491002570694
+        }
+      },
+      "tumor_vs_notumor": {
+        "sensitivity": 0.9845360824742269,
+        "specificity": 0.9851851851851852,
+        "tp": 764,
+        "fn": 12,
+        "fp": 4,
+        "tn": 266
+      },
+      "confusion_matrix": [
+        [
+          249,
+          18,
+          2,
+          1
+        ],
+        [
+          23,
+          190,
+          9,
+          16
+        ],
+        [
+          2,
+          2,
+          266,
+          0
+        ],
+        [
+          3,
+          5,
+          1,
+          259
+        ]
+      ],
+      "calibration": {
+        "nll": 0.21565322841743437,
+        "brier": 0.12150192736324254,
+        "ece": 0.024348156791111235,
+        "mean_confidence": 0.924954855948687,
+        "bins": [
+          {
+            "lo": 0.3333333333333333,
+            "hi": 0.4,
+            "n": 2,
+            "accuracy": 0.0,
+            "confidence": 0.3882128710968034
+          },
+          {
+            "lo": 0.4,
+            "hi": 0.4666666666666667,
+            "n": 7,
+            "accuracy": 0.7142857142857143,
+            "confidence": 0.45158619180185294
+          },
+          {
+            "lo": 0.4666666666666667,
+            "hi": 0.5333333333333333,
+            "n": 21,
+            "accuracy": 0.6666666666666666,
+            "confidence": 0.5015588885901602
+          },
+          {
+            "lo": 0.5333333333333333,
+            "hi": 0.6,
+            "n": 26,
+            "accuracy": 0.5384615384615384,
+            "confidence": 0.5726163201867525
+          },
+          {
+            "lo": 0.6,
+            "hi": 0.6666666666666666,
+            "n": 22,
+            "accuracy": 0.8636363636363636,
+            "confidence": 0.6272271739709158
+          },
+          {
+            "lo": 0.6666666666666666,
+            "hi": 0.7333333333333333,
+            "n": 37,
+            "accuracy": 0.5405405405405406,
+            "confidence": 0.6953371095916846
+          },
+          {
+            "lo": 0.7333333333333333,
+            "hi": 0.8,
+            "n": 32,
+            "accuracy": 0.78125,
+            "confidence": 0.766389557157676
+          },
+          {
+            "lo": 0.8,
+            "hi": 0.8666666666666667,
+            "n": 46,
+            "accuracy": 0.8043478260869565,
+            "confidence": 0.8370374431784162
+          },
+          {
+            "lo": 0.8666666666666667,
+            "hi": 0.9333333333333333,
+            "n": 90,
+            "accuracy": 0.8666666666666667,
+            "confidence": 0.9030391853424089
+          },
+          {
+            "lo": 0.9333333333333333,
+            "hi": 1.0,
+            "n": 763,
+            "accuracy": 0.9855832241153342,
+            "confidence": 0.9886190084848611
+          }
+        ]
+      }
+    },
+    "train": {
+      "n": 4877,
+      "accuracy": 0.9934385892966988,
+      "macro_precision": 0.9931164084817614,
+      "macro_recall": 0.993394118909644,
+      "macro_f1": 0.9932375657891953,
+      "macro_specificity": 0.9978477313575154,
+      "per_class": {
+        "glioma": {
+          "support": 1258,
+          "precision": 0.9975845410628019,
+          "recall": 0.9848966613672496,
+          "f1": 0.9912000000000001,
+          "sensitivity": 0.9848966613672496,
+          "specificity": 0.9991710417242332
+        },
+        "meningioma": {
+          "support": 1108,
+          "precision": 0.98125,
+          "recall": 0.9918772563176895,
+          "f1": 0.9865350089766606,
+          "sensitivity": 0.9918772563176895,
+          "specificity": 0.9944282302998143
+        },
+        "notumor": {
+          "support": 1260,
+          "precision": 0.997624703087886,
+          "recall": 1.0,
+          "f1": 0.9988109393579072,
+          "sensitivity": 1.0,
+          "specificity": 0.9991705833563727
+        },
+        "pituitary": {
+          "support": 1251,
+          "precision": 0.9960063897763578,
+          "recall": 0.996802557953637,
+          "f1": 0.9964043148222133,
+          "sensitivity": 0.996802557953637,
+          "specificity": 0.9986210700496415
+        }
+      },
+      "tumor_vs_notumor": {
+        "sensitivity": 0.9991705833563727,
+        "specificity": 1.0,
+        "tp": 3614,
+        "fn": 3,
+        "fp": 0,
+        "tn": 1260
+      },
+      "confusion_matrix": [
+        [
+          1239,
+          17,
+          1,
+          1
+        ],
+        [
+          3,
+          1099,
+          2,
+          4
+        ],
+        [
+          0,
+          0,
+          1260,
+          0
+        ],
+        [
+          0,
+          4,
+          0,
+          1247
+        ]
+      ]
+    }
+  }
+}

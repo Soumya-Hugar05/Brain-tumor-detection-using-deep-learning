@@ -1,0 +1,64 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# ---- TensorFlow / Keras / ML temporary files ----
+.keras/
+*.tmp
+*.ckpt
+*.ckpt.*
+checkpoints/
+tf_logs/
+tensorboard/
+lightning_logs/
+
+# ---- Large model and feature files (distribute the Phase B bundle separately, see README) ----
+*.joblib
+*.keras
+*.h5
+*.hdf5
+*.pkl
+*.npz
+*.onnx
+*.pt
+*.pth
+
+# ---- Experiment runs: keep configs, reports, metrics and small figures; skip cache ----
+runs/cache/
+
+# ---- Logs and temporary output ----
+*.log
+logs/
+tmp/
+temp/
+*.bak
+*.swp
+*~
+
+# ---- Editor / IDE / OS ----
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+
+# ---- Local application data (report history; may contain file names) ----
+instance/
+
+# ---- Local tool settings ----
+.claude/settings.local.json

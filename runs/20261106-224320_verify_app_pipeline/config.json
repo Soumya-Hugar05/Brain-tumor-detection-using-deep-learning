@@ -1,0 +1,34 @@
+{
+  "run": "20261106-224320_verify_app_pipeline",
+  "created": "2026-11-06T22:43:20",
+  "argv": [
+    "verify_app_pipeline.py",
+    "--fresh-n",
+    "128"
+  ],
+  "seed": 1337,
+  "manifest_sha256": "4d09b01d782fa076890f32bf30bcbbe1a2319c135ead2e58cbd5e1f9ec0d930f",
+  "versions": {
+    "python": "3.13.9",
+    "platform": "Windows-11-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 140 Stepping 2, GenuineIntel",
+    "tensorflow": "2.21.0",
+    "keras": "3.14.0",
+    "scikit-learn": "1.8.0",
+    "numpy": "2.4.3",
+    "scipy": "1.17.1",
+    "opencv-python": "4.13.0.92",
+    "pillow": "12.0.0",
+    "matplotlib": "3.10.8",
+    "joblib": "1.5.3"
+  },
+  "git": {
+    "commit": "23b5d519d91e52a4d66c623979721698551630f2",
+    "dirty_files": 37
+  },
+  "config": {
+    "split": "val",
+    "n": 1046,
+    "bundle": "D:\\college\\projects\\projectPhase1\\runs\\20261105-184406_phaseB_frozen_improvements\\models\\improved_svm"
+  }
+}

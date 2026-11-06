@@ -1,0 +1,273 @@
+{
+  "equivalence": {
+    "baseline": {
+      "model": "baseline",
+      "n": 1046,
+      "kernel": "rbf",
+      "n_support": 2496,
+      "max_abs_diff_ovo_float64": 4.0568360226700406e-08,
+      "max_abs_diff_ovr_float64": 1.51189323283063e-08,
+      "max_abs_diff_ovr_float32": 8.530962909425455e-06,
+      "argmax_agreement_float32": 1.0,
+      "predict_agreement": 1.0,
+      "tolerance": 1e-05,
+      "passed": true,
+      "decision_rule_vs_svm_ovr_argmax_agreement": 0.9694072657743786,
+      "end_to_end_float32_max_abs_diff": 4.516117406705433e-06,
+      "end_to_end_argmax_agreement": 1.0
+    },
+    "improved": {
+      "model": "improved",
+      "n": 1046,
+      "kernel": "rbf",
+      "n_support": 2496,
+      "max_abs_diff_ovo_float64": 4.0568360226700406e-08,
+      "max_abs_diff_ovr_float64": 1.51189323283063e-08,
+      "max_abs_diff_ovr_float32": 8.530962909425455e-06,
+      "argmax_agreement_float32": 1.0,
+      "predict_agreement": 1.0,
+      "tolerance": 1e-05,
+      "passed": true,
+      "decision_rule_vs_svm_ovr_argmax_agreement": 0.9694072657743786,
+      "end_to_end_float32_max_abs_diff": 4.516117406705433e-06,
+      "end_to_end_argmax_agreement": 1.0
+    }
+  },
+  "legacy_limitation": {
+    "cnn_head_val_accuracy": 0.8738049713193117,
+    "svm_val_accuracy": 0.9216061185468452,
+    "cnn_vs_svm_disagreement": 0.0869980879541109,
+    "n_disagree": 91,
+    "n": 1046
+  },
+  "deletion": {
+    "baseline": {
+      "SVM-faithful Grad-CAM": {
+        "mean_margin_curve": [
+          1.0,
+          0.46570952489118506,
+          0.32726987031879706,
+          0.22424706769194408,
+          0.1482423890773472,
+          0.11280060865876046,
+          0.08492270613409388,
+          0.055588519605536596,
+          0.0384111501958025,
+          0.03197225575305697,
+          0.09805251588627804
+        ],
+        "mean_kept_curve": [
+          0.9583333333333334,
+          0.7333333333333333,
+          0.625,
+          0.55,
+          0.48333333333333334,
+          0.39166666666666666,
+          0.36666666666666664,
+          0.3,
+          0.26666666666666666,
+          0.25833333333333336,
+          0.25833333333333336
+        ],
+        "auc_margin": 0.2038190350269663,
+        "auc_margin_sd": 0.31528051265416707,
+        "auc_kept": 0.4583333333333333,
+        "share_images_better_than_random": 0.4083333333333333
+      },
+      "legacy CNN-head Grad-CAM": {
+        "mean_margin_curve": [
+          1.0,
+          0.23258598346375228,
+          0.12891681945674333,
+          0.09506967130128145,
+          0.08858235596812726,
+          0.07411412980764777,
+          0.06476187839290203,
+          0.06295155007395907,
+          0.06238772966412495,
+          0.057762607293701466,
+          0.09805251588627804
+        ],
+        "mean_kept_curve": [
+          0.9583333333333334,
+          0.48333333333333334,
+          0.36666666666666664,
+          0.35,
+          0.35833333333333334,
+          0.3333333333333333,
+          0.3416666666666667,
+          0.2833333333333333,
+          0.275,
+          0.25833333333333336,
+          0.25833333333333336
+        ],
+        "auc_margin": 0.14161589833653787,
+        "auc_margin_sd": 0.28542941972610236,
+        "auc_kept": 0.36583333333333334,
+        "share_images_better_than_random": 0.6833333333333333
+      },
+      "random map": {
+        "mean_margin_curve": [
+          1.0,
+          0.4463475197854924,
+          0.1918254786308996,
+          0.10941393724425943,
+          0.0792115051866086,
+          0.06444372036328873,
+          0.060044409483589044,
+          0.055697146854301535,
+          0.05050998202048567,
+          0.046560646555015815,
+          0.09805251588627804
+        ],
+        "mean_kept_curve": [
+          0.9583333333333334,
+          0.7666666666666667,
+          0.5083333333333333,
+          0.4,
+          0.35,
+          0.3,
+          0.2833333333333333,
+          0.2833333333333333,
+          0.2833333333333333,
+          0.25833333333333336,
+          0.25833333333333336
+        ],
+        "auc_margin": 0.16530806040670795,
+        "auc_margin_sd": 0.2897930465882683,
+        "auc_kept": 0.4041666666666667
+      }
+    },
+    "improved": {
+      "SVM-faithful Grad-CAM": {
+        "mean_margin_curve": [
+          1.0,
+          0.46358771121416054,
+          0.3281170236421161,
+          0.2240192811849503,
+          0.14894918017701883,
+          0.11247783021270033,
+          0.0843300888388993,
+          0.05627012879278545,
+          0.03779762039279885,
+          0.032026378440269614,
+          0.09805251588627804
+        ],
+        "mean_kept_curve": [
+          0.9583333333333334,
+          0.7333333333333333,
+          0.625,
+          0.55,
+          0.48333333333333334,
+          0.38333333333333336,
+          0.36666666666666664,
+          0.3,
+          0.25833333333333336,
+          0.25833333333333336,
+          0.25833333333333336
+        ],
+        "auc_margin": 0.20366015008388377,
+        "auc_margin_sd": 0.3152512309798565,
+        "auc_kept": 0.45666666666666667,
+        "share_images_better_than_random": 0.425
+      },
+      "random map": {
+        "mean_margin_curve": [
+          1.0,
+          0.43181897659438845,
+          0.19565917611239658,
+          0.11933576248464318,
+          0.07847052637363224,
+          0.06782022827778467,
+          0.05433436713773616,
+          0.05216437716593599,
+          0.05310717320720228,
+          0.054463452019537166,
+          0.09805251588627804
+        ],
+        "mean_kept_curve": [
+          0.9583333333333334,
+          0.7666666666666667,
+          0.5166666666666667,
+          0.4666666666666667,
+          0.35,
+          0.3416666666666667,
+          0.2833333333333333,
+          0.275,
+          0.275,
+          0.3,
+          0.25833333333333336
+        ],
+        "auc_margin": 0.16562002973163958,
+        "auc_margin_sd": 0.28866798836891644,
+        "auc_kept": 0.4183333333333334
+      }
+    }
+  },
+  "sanity": {
+    "baseline": {
+      "SVM retrained on permuted labels": {
+        "mean": 0.07045327640479815,
+        "sd": 0.323251836683073,
+        "share_above_0_5": 0.125
+      },
+      "backbone re-initialised: conv5_block3 (3 conv layers)": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "share_above_0_5": 0.0
+      },
+      "backbone re-initialised: conv5_block3, conv5_block2 (6 conv layers)": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "share_above_0_5": 0.0
+      },
+      "backbone re-initialised: conv5_block3, conv5_block2, conv5_block1 (10 conv layers)": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "share_above_0_5": 0.0
+      },
+      "backbone re-initialised: conv5_block3, conv5_block2, conv5_block1, conv4_block6, conv4_block5 (16 conv layers)": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "share_above_0_5": 0.0
+      },
+      "reference: different images' maps": {
+        "mean": 0.24804008537372776,
+        "sd": 0.2594167829923462,
+        "share_above_0_5": 0.175
+      }
+    },
+    "improved": {
+      "SVM retrained on permuted labels": {
+        "mean": 0.07045327640479815,
+        "sd": 0.323251836683073,
+        "share_above_0_5": 0.125
+      },
+      "backbone re-initialised: conv5_block3 (3 conv layers)": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "share_above_0_5": 0.0
+      },
+      "backbone re-initialised: conv5_block3, conv5_block2 (6 conv layers)": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "share_above_0_5": 0.0
+      },
+      "backbone re-initialised: conv5_block3, conv5_block2, conv5_block1 (10 conv layers)": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "share_above_0_5": 0.0
+      },
+      "backbone re-initialised: conv5_block3, conv5_block2, conv5_block1, conv4_block6, conv4_block5 (16 conv layers)": {
+        "mean": 0.0,
+        "sd": 0.0,
+        "share_above_0_5": 0.0
+      },
+      "reference: different images' maps": {
+        "mean": 0.24804008537372776,
+        "sd": 0.2594167829923462,
+        "share_above_0_5": 0.175
+      }
+    }
+  }
+}

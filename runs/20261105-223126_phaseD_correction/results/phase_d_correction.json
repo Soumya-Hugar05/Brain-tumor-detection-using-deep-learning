@@ -1,0 +1,86 @@
+{
+  "baseline_vs_improved_max_abs_decision_diff_val": 0.0,
+  "rule_relationship": {
+    "n": 1046,
+    "disagreement_rate": 0.030592734225621414,
+    "n_disagree": 32,
+    "accuracy_platt_rule": 0.9216061185468452,
+    "accuracy_ovr_argmax": 0.9168260038240917,
+    "accuracy_svc_predict_vote": 0.9168260038240917,
+    "ovr_argmax_equals_svc_predict": 1.0,
+    "median_top2_ovr_gap_agree": 1.1325939547121986,
+    "median_top2_ovr_gap_disagree": 1.0150406444853688,
+    "disagree_correct_by_platt": 18,
+    "disagree_correct_by_ovr": 13,
+    "disagree_by_true_class": {
+      "glioma": 18,
+      "meningioma": 11,
+      "notumor": 2,
+      "pituitary": 1
+    },
+    "median_platt_top_prob_agree": 0.9903227810057834,
+    "median_platt_top_prob_disagree": 0.5969755732716997
+  },
+  "saturation_diagnosis": [
+    {
+      "reinit": [],
+      "feature_mean": 0.47140413522720337,
+      "feature_sd": 0.7814536690711975,
+      "min_gamma_d2": 0.30715283611865113,
+      "max_kernel_value": 0.7355381755162763,
+      "n_images": 8,
+      "n_constant_maps": 0
+    },
+    {
+      "reinit": [
+        "conv5_block3"
+      ],
+      "feature_mean": 4.534041881561279,
+      "feature_sd": 4.747380256652832,
+      "min_gamma_d2": 711.2538329112455,
+      "max_kernel_value": 1.277571261983683e-309,
+      "n_images": 8,
+      "n_constant_maps": 8
+    },
+    {
+      "reinit": [
+        "conv5_block3",
+        "conv5_block2"
+      ],
+      "feature_mean": 38.4150390625,
+      "feature_sd": 44.079654693603516,
+      "min_gamma_d2": 76203.52165596721,
+      "max_kernel_value": 0.0,
+      "n_images": 8,
+      "n_constant_maps": 8
+    },
+    {
+      "reinit": [
+        "conv5_block3",
+        "conv5_block2",
+        "conv5_block1"
+      ],
+      "feature_mean": 189.55258178710938,
+      "feature_sd": 229.70030212402344,
+      "min_gamma_d2": 1927044.2670708792,
+      "max_kernel_value": 0.0,
+      "n_images": 8,
+      "n_constant_maps": 8
+    },
+    {
+      "reinit": [
+        "conv5_block3",
+        "conv5_block2",
+        "conv5_block1",
+        "conv4_block6",
+        "conv4_block5"
+      ],
+      "feature_mean": 1459.876708984375,
+      "feature_sd": 1794.058837890625,
+      "min_gamma_d2": 107617709.68493441,
+      "max_kernel_value": 0.0,
+      "n_images": 8,
+      "n_constant_maps": 8
+    }
+  ]
+}

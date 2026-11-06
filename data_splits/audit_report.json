@@ -1,0 +1,997 @@
+{
+  "status": "PASSED",
+  "generated_utc": "2026-10-31 18:26:20",
+  "config": {
+    "dataset_dir": "dataset",
+    "threshold": 4,
+    "ratios": [
+      0.7,
+      0.15,
+      0.15
+    ],
+    "seed": 1337,
+    "max_group_frac": 0.02,
+    "ratio_tolerance": 0.02,
+    "hashes": "pHash (32x32 DCT, 8x8 low freq) + dHash (9x8), both <= threshold; or equal MD5",
+    "pixel_rule": "64px thumbnail corr >= 0.93 (original or mirrored) -> 256px corr >= 0.95 and 32px-block corr p10 >= 0.85 in the better orientation",
+    "link_related": false,
+    "extra_exclusions": [
+      {
+        "path": "Testing/meningioma/Te-me_115.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Testing/pituitary/Te-pi_206.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/meningioma/Tr-me_105.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/meningioma/Tr-me_116.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/meningioma/Tr-me_409.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/meningioma/Tr-me_533.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/meningioma/Tr-me_964.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_1023.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_1071.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_1098.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_1133.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_1155.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_1207.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_1309.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_1320.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_1380.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_261.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_91.jpg",
+        "reason": "label_conflict_copy"
+      },
+      {
+        "path": "Training/pituitary/Tr-pi_991.jpg",
+        "reason": "label_conflict_copy"
+      }
+    ],
+    "exclusion_rules": {
+      "pre_augmented": "filename matches /-aug-/i",
+      "label_conflict_copy": [
+        "Testing/glioma/Te-gl_160.jpg",
+        "Testing/glioma/Te-gl_68.jpg",
+        "Testing/meningioma/Te-me_115.jpg",
+        "Testing/meningioma/Te-me_159.jpg",
+        "Testing/meningioma/Te-me_50.jpg",
+        "Testing/meningioma/Te-me_61.jpg",
+        "Testing/meningioma/Te-me_96.jpg",
+        "Testing/pituitary/Te-pi_206.jpg",
+        "Training/meningioma/Tr-me_105.jpg",
+        "Training/meningioma/Tr-me_1122.jpg",
+        "Training/meningioma/Tr-me_116.jpg",
+        "Training/meningioma/Tr-me_409.jpg",
+        "Training/meningioma/Tr-me_458.jpg",
+        "Training/meningioma/Tr-me_468.jpg",
+        "Training/meningioma/Tr-me_533.jpg",
+        "Training/meningioma/Tr-me_714.jpg",
+        "Training/meningioma/Tr-me_964.jpg",
+        "Training/pituitary/Tr-pi_1023.jpg",
+        "Training/pituitary/Tr-pi_1071.jpg",
+        "Training/pituitary/Tr-pi_1098.jpg",
+        "Training/pituitary/Tr-pi_1133.jpg",
+        "Training/pituitary/Tr-pi_1155.jpg",
+        "Training/pituitary/Tr-pi_1207.jpg",
+        "Training/pituitary/Tr-pi_1309.jpg",
+        "Training/pituitary/Tr-pi_1320.jpg",
+        "Training/pituitary/Tr-pi_1380.jpg",
+        "Training/pituitary/Tr-pi_261.jpg",
+        "Training/pituitary/Tr-pi_91.jpg",
+        "Training/pituitary/Tr-pi_991.jpg"
+      ]
+    },
+    "documented_keep": [
+      [
+        "Testing/glioma/Te-gl_75.jpg",
+        "Testing/meningioma/Te-me_283.jpg"
+      ]
+    ],
+    "versions": {
+      "python": "3.13.9",
+      "numpy": "2.4.4",
+      "pillow": "12.2.0",
+      "scipy": "1.17.1"
+    }
+  },
+  "labels": [
+    "glioma",
+    "meningioma",
+    "notumor",
+    "pituitary"
+  ],
+  "dataset": {
+    "images": 7200,
+    "eligible_images": 6968,
+    "excluded_images": 232,
+    "fingerprint": "00bcb879ebc8a95a902b39bd25901b244bf4f7f93d8468487761b4a0b071d131",
+    "groups": 3577,
+    "multi_image_groups": 1975,
+    "exact_groups": 67,
+    "near_groups": 1908,
+    "images_in_multi_groups": 5598,
+    "largest_group": 46,
+    "group_size_histogram": {
+      "1": 1602,
+      "2": 1598,
+      "3": 89,
+      "4": 133,
+      "5": 16,
+      "6": 43,
+      "7": 12,
+      "8": 12,
+      "9": 8,
+      "10": 11,
+      "11": 6,
+      "12": 10,
+      "13": 9,
+      "14": 3,
+      "15": 4,
+      "16": 3,
+      "17": 4,
+      "18": 2,
+      "19": 2,
+      "20": 1,
+      "21": 1,
+      "25": 2,
+      "29": 1,
+      "31": 1,
+      "33": 1,
+      "36": 1,
+      "42": 1,
+      "46": 1
+    },
+    "links_by_type": {
+      "pixel_mirror": 5630,
+      "near_hash": 4406,
+      "exact_md5": 227,
+      "pixel_same": 605
+    },
+    "pixel_only_links": 6235,
+    "pixel_only_mirror": 5630,
+    "pixel_only_same": 605,
+    "mirror_links_total": 5631,
+    "unconfirmed_candidates": 4848,
+    "label_conflict_groups": 9
+  },
+  "exclusions": {
+    "label_conflict_copy": {
+      "count": 29,
+      "description": "Copy of a scan that is also filed under another class folder; the true label is unknown.",
+      "by_class": {
+        "glioma": 2,
+        "meningioma": 14,
+        "pituitary": 13
+      },
+      "by_original_folder": {
+        "Testing": 8,
+        "Training": 21
+      },
+      "groups": {
+        "g00067": [
+          "Testing/glioma/Te-gl_160.jpg",
+          "Testing/meningioma/Te-me_159.jpg",
+          "Training/meningioma/Tr-me_1122.jpg"
+        ],
+        "g00327": [
+          "Testing/glioma/Te-gl_68.jpg",
+          "Testing/meningioma/Te-me_50.jpg",
+          "Testing/meningioma/Te-me_61.jpg",
+          "Testing/meningioma/Te-me_96.jpg",
+          "Training/meningioma/Tr-me_458.jpg",
+          "Training/meningioma/Tr-me_468.jpg",
+          "Training/meningioma/Tr-me_714.jpg"
+        ],
+        "g00388": [
+          "Training/meningioma/Tr-me_409.jpg",
+          "Training/pituitary/Tr-pi_1309.jpg",
+          "Training/pituitary/Tr-pi_261.jpg"
+        ],
+        "g00476": [
+          "Testing/meningioma/Te-me_115.jpg",
+          "Testing/pituitary/Te-pi_206.jpg"
+        ],
+        "g02341": [
+          "Training/meningioma/Tr-me_105.jpg",
+          "Training/pituitary/Tr-pi_1023.jpg",
+          "Training/pituitary/Tr-pi_1071.jpg",
+          "Training/pituitary/Tr-pi_1207.jpg",
+          "Training/pituitary/Tr-pi_991.jpg"
+        ],
+        "g02424": [
+          "Training/meningioma/Tr-me_116.jpg",
+          "Training/pituitary/Tr-pi_1133.jpg",
+          "Training/pituitary/Tr-pi_1320.jpg"
+        ],
+        "g02694": [
+          "Training/meningioma/Tr-me_533.jpg",
+          "Training/pituitary/Tr-pi_91.jpg"
+        ],
+        "g02777": [
+          "Training/meningioma/Tr-me_964.jpg",
+          "Training/pituitary/Tr-pi_1098.jpg",
+          "Training/pituitary/Tr-pi_1155.jpg",
+          "Training/pituitary/Tr-pi_1380.jpg"
+        ]
+      }
+    },
+    "pre_augmented": {
+      "count": 203,
+      "description": "Pre-augmented copy shipped with the dataset (filename contains '-aug-'); geometric transforms evade perceptual hashing, so it could leak across splits.",
+      "by_class": {
+        "meningioma": 203
+      },
+      "by_original_folder": {
+        "Testing": 103,
+        "Training": 100
+      }
+    }
+  },
+  "splits": {
+    "train": {
+      "images": 4877,
+      "groups": 2391,
+      "classes": {
+        "glioma": 1258,
+        "meningioma": 1108,
+        "notumor": 1260,
+        "pituitary": 1251
+      },
+      "from_original": {
+        "Testing": 1046,
+        "Training": 3831
+      }
+    },
+    "val": {
+      "images": 1046,
+      "groups": 506,
+      "classes": {
+        "glioma": 270,
+        "meningioma": 238,
+        "notumor": 270,
+        "pituitary": 268
+      },
+      "from_original": {
+        "Testing": 221,
+        "Training": 825
+      }
+    },
+    "test": {
+      "images": 1045,
+      "groups": 508,
+      "classes": {
+        "glioma": 270,
+        "meningioma": 237,
+        "notumor": 270,
+        "pituitary": 268
+      },
+      "from_original": {
+        "Testing": 222,
+        "Training": 823
+      }
+    },
+    "excluded": {
+      "images": 232,
+      "groups": 208,
+      "classes": {
+        "glioma": 2,
+        "meningioma": 217,
+        "notumor": 0,
+        "pituitary": 13
+      },
+      "from_original": {
+        "Testing": 111,
+        "Training": 121
+      }
+    }
+  },
+  "mixed_label_groups": [
+    {
+      "group_id": "g00067",
+      "members": [
+        {
+          "path": "Testing/glioma/Te-gl_160.jpg",
+          "label": "glioma",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Testing/meningioma/Te-me_159.jpg",
+          "label": "meningioma",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/meningioma/Tr-me_1122.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        }
+      ],
+      "cross_label_links": [
+        {
+          "a": "Testing/glioma/Te-gl_160.jpg",
+          "b": "Testing/meningioma/Te-me_159.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.9963,
+          "block_corr_p10": 0.9901,
+          "documented_keep": false
+        },
+        {
+          "a": "Testing/glioma/Te-gl_160.jpg",
+          "b": "Training/meningioma/Tr-me_1122.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.9963,
+          "block_corr_p10": 0.9901,
+          "documented_keep": false
+        }
+      ],
+      "all_excluded": true
+    },
+    {
+      "group_id": "g00327",
+      "members": [
+        {
+          "path": "Testing/glioma/Te-gl_68.jpg",
+          "label": "glioma",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Testing/meningioma/Te-me_50.jpg",
+          "label": "meningioma",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Testing/meningioma/Te-me_61.jpg",
+          "label": "meningioma",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Testing/meningioma/Te-me_96.jpg",
+          "label": "meningioma",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/meningioma/Tr-me_458.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/meningioma/Tr-me_468.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/meningioma/Tr-me_714.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        }
+      ],
+      "cross_label_links": [
+        {
+          "a": "Testing/glioma/Te-gl_68.jpg",
+          "b": "Testing/meningioma/Te-me_50.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.9978,
+          "block_corr_p10": 0.9128,
+          "documented_keep": false
+        },
+        {
+          "a": "Testing/glioma/Te-gl_68.jpg",
+          "b": "Testing/meningioma/Te-me_61.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.999,
+          "block_corr_p10": 0.9588,
+          "documented_keep": false
+        },
+        {
+          "a": "Testing/glioma/Te-gl_68.jpg",
+          "b": "Testing/meningioma/Te-me_96.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.999,
+          "block_corr_p10": 0.9591,
+          "documented_keep": false
+        },
+        {
+          "a": "Testing/glioma/Te-gl_68.jpg",
+          "b": "Training/meningioma/Tr-me_458.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.999,
+          "block_corr_p10": 0.9591,
+          "documented_keep": false
+        },
+        {
+          "a": "Testing/glioma/Te-gl_68.jpg",
+          "b": "Training/meningioma/Tr-me_468.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.9978,
+          "block_corr_p10": 0.9128,
+          "documented_keep": false
+        },
+        {
+          "a": "Testing/glioma/Te-gl_68.jpg",
+          "b": "Training/meningioma/Tr-me_714.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.999,
+          "block_corr_p10": 0.9588,
+          "documented_keep": false
+        }
+      ],
+      "all_excluded": true
+    },
+    {
+      "group_id": "g00334",
+      "members": [
+        {
+          "path": "Testing/glioma/Te-gl_75.jpg",
+          "label": "glioma",
+          "source": "Testing",
+          "split": "train",
+          "exclusion": ""
+        },
+        {
+          "path": "Testing/meningioma/Te-aug-me_36.jpg",
+          "label": "meningioma",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "pre_augmented"
+        },
+        {
+          "path": "Testing/meningioma/Te-me_283.jpg",
+          "label": "meningioma",
+          "source": "Testing",
+          "split": "train",
+          "exclusion": ""
+        },
+        {
+          "path": "Training/glioma/Tr-gl_988.jpg",
+          "label": "glioma",
+          "source": "Training",
+          "split": "train",
+          "exclusion": ""
+        },
+        {
+          "path": "Training/meningioma/Tr-me_79.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "train",
+          "exclusion": ""
+        }
+      ],
+      "cross_label_links": [
+        {
+          "a": "Testing/glioma/Te-gl_75.jpg",
+          "b": "Testing/meningioma/Te-me_283.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.7306,
+          "block_corr_p10": -0.049,
+          "documented_keep": true
+        }
+      ],
+      "all_excluded": false
+    },
+    {
+      "group_id": "g00388",
+      "members": [
+        {
+          "path": "Testing/meningioma/Te-aug-me_35.jpg",
+          "label": "meningioma",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "pre_augmented"
+        },
+        {
+          "path": "Training/meningioma/Tr-me_409.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_1309.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_261.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        }
+      ],
+      "cross_label_links": [
+        {
+          "a": "Testing/meningioma/Te-aug-me_35.jpg",
+          "b": "Training/pituitary/Tr-pi_1309.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.8897,
+          "block_corr_p10": 0.2981,
+          "documented_keep": false
+        },
+        {
+          "a": "Testing/meningioma/Te-aug-me_35.jpg",
+          "b": "Training/pituitary/Tr-pi_261.jpg",
+          "link_type": "near_hash",
+          "orientation": "same",
+          "corr256": 0.8897,
+          "block_corr_p10": 0.2981,
+          "documented_keep": false
+        },
+        {
+          "a": "Training/meningioma/Tr-me_409.jpg",
+          "b": "Training/pituitary/Tr-pi_1309.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.998,
+          "documented_keep": false
+        },
+        {
+          "a": "Training/meningioma/Tr-me_409.jpg",
+          "b": "Training/pituitary/Tr-pi_261.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.998,
+          "documented_keep": false
+        }
+      ],
+      "all_excluded": true
+    },
+    {
+      "group_id": "g00476",
+      "members": [
+        {
+          "path": "Testing/meningioma/Te-me_115.jpg",
+          "label": "meningioma",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Testing/pituitary/Te-pi_206.jpg",
+          "label": "pituitary",
+          "source": "Testing",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        }
+      ],
+      "cross_label_links": [
+        {
+          "a": "Testing/meningioma/Te-me_115.jpg",
+          "b": "Testing/pituitary/Te-pi_206.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.993,
+          "documented_keep": false
+        }
+      ],
+      "all_excluded": true
+    },
+    {
+      "group_id": "g02341",
+      "members": [
+        {
+          "path": "Training/meningioma/Tr-me_105.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_1023.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_1071.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_1207.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_991.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        }
+      ],
+      "cross_label_links": [
+        {
+          "a": "Training/meningioma/Tr-me_105.jpg",
+          "b": "Training/pituitary/Tr-pi_1023.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.9968,
+          "documented_keep": false
+        },
+        {
+          "a": "Training/meningioma/Tr-me_105.jpg",
+          "b": "Training/pituitary/Tr-pi_1071.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.9968,
+          "documented_keep": false
+        },
+        {
+          "a": "Training/meningioma/Tr-me_105.jpg",
+          "b": "Training/pituitary/Tr-pi_1207.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.9968,
+          "documented_keep": false
+        },
+        {
+          "a": "Training/meningioma/Tr-me_105.jpg",
+          "b": "Training/pituitary/Tr-pi_991.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.9968,
+          "documented_keep": false
+        }
+      ],
+      "all_excluded": true
+    },
+    {
+      "group_id": "g02424",
+      "members": [
+        {
+          "path": "Training/meningioma/Tr-me_116.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_1133.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_1320.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        }
+      ],
+      "cross_label_links": [
+        {
+          "a": "Training/meningioma/Tr-me_116.jpg",
+          "b": "Training/pituitary/Tr-pi_1133.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9997,
+          "block_corr_p10": 0.9948,
+          "documented_keep": false
+        },
+        {
+          "a": "Training/meningioma/Tr-me_116.jpg",
+          "b": "Training/pituitary/Tr-pi_1320.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9997,
+          "block_corr_p10": 0.9948,
+          "documented_keep": false
+        }
+      ],
+      "all_excluded": true
+    },
+    {
+      "group_id": "g02694",
+      "members": [
+        {
+          "path": "Training/meningioma/Tr-me_533.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_91.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        }
+      ],
+      "cross_label_links": [
+        {
+          "a": "Training/meningioma/Tr-me_533.jpg",
+          "b": "Training/pituitary/Tr-pi_91.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.9978,
+          "documented_keep": false
+        }
+      ],
+      "all_excluded": true
+    },
+    {
+      "group_id": "g02777",
+      "members": [
+        {
+          "path": "Training/meningioma/Tr-me_964.jpg",
+          "label": "meningioma",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_1098.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_1155.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        },
+        {
+          "path": "Training/pituitary/Tr-pi_1380.jpg",
+          "label": "pituitary",
+          "source": "Training",
+          "split": "excluded",
+          "exclusion": "label_conflict_copy"
+        }
+      ],
+      "cross_label_links": [
+        {
+          "a": "Training/meningioma/Tr-me_964.jpg",
+          "b": "Training/pituitary/Tr-pi_1098.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.9977,
+          "documented_keep": false
+        },
+        {
+          "a": "Training/meningioma/Tr-me_964.jpg",
+          "b": "Training/pituitary/Tr-pi_1155.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.9977,
+          "documented_keep": false
+        },
+        {
+          "a": "Training/meningioma/Tr-me_964.jpg",
+          "b": "Training/pituitary/Tr-pi_1380.jpg",
+          "link_type": "pixel_mirror",
+          "orientation": "mirror",
+          "corr256": 0.9998,
+          "block_corr_p10": 0.9977,
+          "documented_keep": false
+        }
+      ],
+      "all_excluded": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "Every original image accounted for exactly once",
+      "passed": true,
+      "detail": "7200 rows, 7200 files on disk; repeated 0, missing on disk 0, not in manifest 0"
+    },
+    {
+      "name": "Excluded images are exactly the listed ones and in no train/val/test split",
+      "passed": true,
+      "detail": "excluded 232: {'label_conflict_copy': 29, 'pre_augmented': 203}; inconsistent rows 0"
+    },
+    {
+      "name": "Label-conflict exclusions cover complete duplicate groups",
+      "passed": true,
+      "detail": "8 groups; with eligible images left: []"
+    },
+    {
+      "name": "No undocumented cross-label duplicate link among eligible images",
+      "passed": true,
+      "detail": "1 cross-label links, 1 documented as different scans; undocumented 0"
+    },
+    {
+      "name": "No duplicate group spans more than one of train/val/test",
+      "passed": true,
+      "detail": "3405 groups with eligible images; crossing 0"
+    },
+    {
+      "name": "No duplicate link (hash or mirror-aware pixel copy) connects two different splits",
+      "passed": true,
+      "detail": "10868 links checked {'pixel_mirror': 5630, 'near_hash': 4406, 'exact_md5': 227, 'pixel_same': 605}; crossing 0"
+    },
+    {
+      "name": "No oversized duplicate group (chaining guard)",
+      "passed": true,
+      "detail": "largest group 46 images; limit 2% of 7200 = 144"
+    },
+    {
+      "name": "All classes present in train, val and test",
+      "passed": true,
+      "detail": "missing: none"
+    },
+    {
+      "name": "Per-class split ratios within 2% of target",
+      "passed": true,
+      "detail": "off target: none"
+    },
+    {
+      "name": "Class balance in each split (smallest/largest class >= 0.75)",
+      "passed": true,
+      "detail": "train 0.88, val 0.88, test 0.88"
+    }
+  ],
+  "errors": [],
+  "warnings": [
+    "205 test image(s) have an UNCONFIRMED pixel candidate in train (64px corr >= 0.93, failed 256px confirmation); by 256px corr band {'0.95-1.00': 1, '0.90-0.95': 113, '0.85-0.90': 91, '0.00-0.85': 0}. Mostly reprocessed no-tumor copies or adjacent slices of the same patient; see review_pairs.csv.",
+    "187 val image(s) have an UNCONFIRMED pixel candidate in train (64px corr >= 0.93, failed 256px confirmation); by 256px corr band {'0.95-1.00': 1, '0.90-0.95': 89, '0.85-0.90': 97, '0.00-0.85': 0}. Mostly reprocessed no-tumor copies or adjacent slices of the same patient; see review_pairs.csv.",
+    "34 test image(s) have an UNCONFIRMED pixel candidate in val (64px corr >= 0.93, failed 256px confirmation); by 256px corr band {'0.95-1.00': 0, '0.90-0.95': 19, '0.85-0.90': 15, '0.00-0.85': 0}. Mostly reprocessed no-tumor copies or adjacent slices of the same patient; see review_pairs.csv."
+  ],
+  "sensitivity": {
+    "test->train": {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 23,
+      "6": 160,
+      "7": 208,
+      "8": 408,
+      "9": 450,
+      "10": 599
+    },
+    "val->train": {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 18,
+      "6": 122,
+      "7": 170,
+      "8": 343,
+      "9": 394,
+      "10": 589
+    },
+    "test->val": {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 2,
+      "6": 32,
+      "7": 36,
+      "8": 83,
+      "9": 102,
+      "10": 186
+    }
+  },
+  "residual": {
+    "test->train": {
+      "0.95-1.00": 1,
+      "0.90-0.95": 113,
+      "0.85-0.90": 91,
+      "0.00-0.85": 0
+    },
+    "val->train": {
+      "0.95-1.00": 1,
+      "0.90-0.95": 89,
+      "0.85-0.90": 97,
+      "0.00-0.85": 0
+    },
+    "test->val": {
+      "0.95-1.00": 0,
+      "0.90-0.95": 19,
+      "0.85-0.90": 15,
+      "0.00-0.85": 0
+    }
+  },
+  "limitations": [
+    "No patient IDs are available, so this is NOT a patient-level split. Adjacent slices of the same patient (visible as unconfirmed candidates with low block correlation) can sit in different splits, so test scores may still be somewhat optimistic.",
+    "A link means the images are near-identical after optional horizontal mirroring and brightness/contrast normalization, not proof of the same scan. Thresholds were calibrated by visual review of sampled pairs, not every pair.",
+    "Heavily reprocessed copies (sharpening, blurring, strong gamma), mostly in the no-tumor class, can fail pixel confirmation and remain in different splits. They are counted in 'Remaining possible leakage' and listed in review_pairs.csv.",
+    "Rotated, cropped or zoomed copies are not detected; only horizontal mirroring is handled. The '-aug-' exclusion removes the known pre-augmented files.",
+    "Exclusions are rule-based ('-aug-' filenames) or explicit lists of label-conflict copies verified by pixel correlation. Label errors that are not duplicates cannot be detected.",
+    "Hash and thumbnail values depend on Pillow resampling and floating-point arithmetic; versions are recorded in audit_report.json and --verify-only recomputes all links."
+  ],
+  "manifest_sha256": "4d09b01d782fa076890f32bf30bcbbe1a2319c135ead2e58cbd5e1f9ec0d930f"
+}
