@@ -1,0 +1,38 @@
+{% from "_components.html" import icon, logo %}
+<div class="public-top">
+  <div class="disclaimer" role="note">
+    <strong>Research prototype.</strong> {{ disclaimer }}
+  </div>
+  <nav class="pnav" aria-label="Main">
+    <div class="wrap pnav-inner">
+      <a class="brand" href="{{ url_for('landing') }}#home" aria-label="NeuroInsight home page">
+        {{ logo() }}
+        <span class="brand-text"><span class="brand-name">NeuroInsight</span></span>
+      </a>
+      <button id="navToggle" type="button" class="icon-btn pnav-toggle" aria-expanded="false" aria-controls="navMenu" aria-label="Open menu">
+        {{ icon('menu') }}
+      </button>
+      <div id="navMenu" class="pnav-menu">
+        <ul class="pnav-links">
+          <li><a href="{{ url_for('landing') }}#home">Home</a></li>
+          <li><a href="{{ url_for('landing') }}#about">About</a></li>
+          <li><a href="{{ url_for('landing') }}#features">Features</a></li>
+          <li><a href="{{ url_for('landing') }}#how-it-works">How It Works</a></li>
+          <li><a href="{{ url_for('landing') }}#model-information">Model Information</a></li>
+        </ul>
+        <div class="pnav-actions">
+          <button id="themeToggle" type="button" class="icon-btn" aria-label="Switch to light theme" title="Switch theme">
+            <svg class="icon icon-sun" aria-hidden="true" focusable="false"><use href="{{ url_for('static', filename='icons/sprite.svg') }}#i-sun"></use></svg>
+            <svg class="icon icon-moon" aria-hidden="true" focusable="false"><use href="{{ url_for('static', filename='icons/sprite.svg') }}#i-moon"></use></svg>
+          </button>
+          {% if current_user.is_authenticated %}
+            <a class="btn btn-primary btn-sm" href="{{ url_for('dashboard.home') }}">Dashboard</a>
+          {% else %}
+            <a class="btn btn-ghost btn-sm" href="{{ url_for('auth.login') }}">Login</a>
+            <a class="btn btn-primary btn-sm" href="{{ url_for('auth.signup') }}">Get Started</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+</div>

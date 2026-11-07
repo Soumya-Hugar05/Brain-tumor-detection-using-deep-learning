@@ -1,0 +1,11 @@
+{# Needs: page, pages, total. Keeps the current filters in the links. #}
+{% if pages > 1 %}
+<nav class="pagination" aria-label="Pagination">
+  <span class="page-num">Page {{ page }} of {{ pages }} · {{ total }} items</span>
+  <div class="pager-btns">
+    {% set args = request.args.to_dict() %}
+    {% if page > 1 %}{% set _ = args.update(page=page - 1) %}<a class="btn btn-secondary btn-sm" href="{{ request.path }}?{{ args | urlencode }}">Previous</a>{% endif %}
+    {% if page < pages %}{% set _ = args.update(page=page + 1) %}<a class="btn btn-secondary btn-sm" href="{{ request.path }}?{{ args | urlencode }}">Next</a>{% endif %}
+  </div>
+</nav>
+{% endif %}

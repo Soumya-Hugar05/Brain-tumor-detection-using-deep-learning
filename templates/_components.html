@@ -1,0 +1,43 @@
+{# Reusable Jinja components. Import with: {% from "_components.html" import icon %} #}
+{% macro icon(name, cls='') -%}
+<svg class="icon {{ cls }}" aria-hidden="true" focusable="false"><use href="{{ url_for('static', filename='icons/sprite.svg') }}#i-{{ name }}"></use></svg>
+{%- endmacro %}
+
+{% macro logo(cls='logo') -%}
+<svg class="{{ cls }}" viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+  <rect width="40" height="40" rx="11" class="logo-bg" />
+  <path d="M7 21h6l3-8 5 15 3-9 2 2h7" class="logo-line" />
+</svg>
+{%- endmacro %}
+
+{# Form field with label, hint and server-side errors. #}
+{% macro field(name, label, type='text', value='', errors=none, autocomplete='', required=true, hint='', maxlength=none) -%}
+<div class="field-block{% if errors and errors.get(name) %} has-error{% endif %}">
+  <label for="f-{{ name }}">{{ label }}{% if not required %} <span class="opt">(optional)</span>{% endif %}</label>
+  <input id="f-{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value }}" {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+         {% if required %}required{% endif %} {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}
+         {% if errors and errors.get(name) %}aria-invalid="true" aria-describedby="e-{{ name }}"{% endif %} />
+  {% if hint %}<p class="hint">{{ hint }}</p>{% endif %}
+  {% if errors and errors.get(name) %}<ul class="field-errors" id="e-{{ name }}">{% for m in errors[name] %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}
+</div>
+{%- endmacro %}
+
+{# Password field with show/hide button (behaviour in static/js/auth.js). #}
+{% macro password_field(name, label, errors=none, autocomplete='current-password', meter=false, hint='') -%}
+<div class="field-block{% if errors and errors.get(name) %} has-error{% endif %}">
+  <label for="f-{{ name }}">{{ label }}</label>
+  <div class="pw-wrap">
+    <input id="f-{{ name }}" name="{{ name }}" type="password" autocomplete="{{ autocomplete }}" required maxlength="128"
+           {% if meter %}data-strength="1"{% endif %} {% if errors and errors.get(name) %}aria-invalid="true" aria-describedby="e-{{ name }}"{% endif %} />
+    <button type="button" class="pw-toggle" data-toggle-for="f-{{ name }}" aria-label="Show password" aria-pressed="false">
+      {{ icon('eye') }}
+    </button>
+  </div>
+  {% if hint %}<p class="hint">{{ hint }}</p>{% endif %}
+  {% if meter %}<div class="strength" aria-live="polite"><div class="strength-bar"><span></span></div><p class="strength-label hint">Password strength: <b>–</b></p>
+    <ul class="pw-rules hint"><li data-rule="len">At least 10 characters</li><li data-rule="mix">Three of: lower-case, upper-case, digits, symbols</li><li data-rule="common">Not a common password</li></ul></div>{% endif %}
+  {% if errors and errors.get(name) %}<ul class="field-errors" id="e-{{ name }}">{% for m in errors[name] %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}
+</div>
+{%- endmacro %}
+
+{% macro csrf() -%}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{%- endmacro %}

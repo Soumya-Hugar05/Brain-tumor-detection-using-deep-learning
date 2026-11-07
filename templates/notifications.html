@@ -1,0 +1,28 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon, csrf %}
+{% block title %}Notifications – NeuroInsight{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+{% block content %}
+<h1 class="sr-only">Notifications</h1>
+<section class="card" aria-labelledby="n-h">
+  <div class="card-head"><h2 id="n-h">Your notifications <span class="hint">({{ total }})</span></h2>
+    {% if items %}<div class="inline-filters">
+      <form method="post" action="{{ url_for('account.mark_read') }}">{{ csrf() }}<button type="submit" class="btn btn-secondary btn-sm">Mark all as read</button></form>
+      <form method="post" action="{{ url_for('account.clear') }}">{{ csrf() }}<button type="submit" class="btn btn-secondary btn-sm">Clear all</button></form>
+    </div>{% endif %}
+  </div>
+  {% if items %}
+  <ul class="item-list" id="notifList">{% for n in items %}
+    <li class="notif{% if not n.read_at %} unread{% endif %}" data-kind="{{ n.kind }}">
+      <div><b>{{ n.title }}</b>{% if n.body %}<span class="hint">{{ n.body }}</span>{% endif %}
+        <span class="hint">{{ n.created_at.strftime('%Y-%m-%d %H:%M') }} UTC{% if n.href and n.href.startswith('/app/') %} · <a class="link" href="{{ n.href }}">Open</a>{% endif %}</span></div>
+      {% if not n.read_at %}<form method="post" action="{{ url_for('account.mark_read') }}">{{ csrf() }}<input type="hidden" name="id" value="{{ n.id }}" />
+        <button type="submit" class="act">Mark read</button></form>{% endif %}
+    </li>{% endfor %}
+  </ul>
+  {% include "_pager.html" %}
+  {% else %}
+  <div class="empty-state small">{{ icon('bell', 'icon-xl') }}<b>No notifications</b><span class="hint">Events such as saved reports, completed analyses and password changes appear here.</span></div>
+  {% endif %}
+</section>
+{% endblock %}

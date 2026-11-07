@@ -1,0 +1,44 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon, password_field, csrf %}
+{% block title %}Settings – NeuroInsight{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block content %}
+<h1 class="sr-only">Settings</h1>
+
+<section class="card" aria-labelledby="pref-h">
+  <div class="card-head"><h2 id="pref-h">Appearance and notifications</h2></div>
+  <form method="post" action="{{ url_for('account.save_preferences') }}" class="stack-form">
+    {{ csrf() }}
+    <fieldset class="field-block"><legend>Theme</legend>
+      <label class="check"><input type="radio" name="theme" value="dark"{% if (current_user.theme or 'dark') == 'dark' %} checked{% endif %} /> Dark</label>
+      <label class="check"><input type="radio" name="theme" value="light"{% if current_user.theme == 'light' %} checked{% endif %} /> Light</label>
+    </fieldset>
+    <fieldset class="field-block"><legend>Notify me when</legend>
+      <label class="check"><input type="checkbox" name="notify_analysis"{% if current_user.notify_analysis %} checked{% endif %} /> an analysis is completed</label>
+      <label class="check"><input type="checkbox" name="notify_reports"{% if current_user.notify_reports %} checked{% endif %} /> a report is saved</label>
+      <p class="hint">Security notices (password changes, sign-outs) are always delivered.</p>
+    </fieldset>
+    <div class="actions"><button type="submit" class="btn btn-primary">Save preferences</button></div>
+  </form>
+</section>
+
+<section class="card" aria-labelledby="pw-h">
+  <div class="card-head"><h2 id="pw-h">Change password</h2></div>
+  <form method="post" action="{{ url_for('account.change_password') }}" class="stack-form" novalidate>
+    {{ csrf() }}
+    {{ password_field('current_password', 'Current password', errors, 'current-password') }}
+    {{ password_field('password', 'New password', errors, 'new-password', meter=true) }}
+    {{ password_field('confirm_password', 'Confirm new password', errors, 'new-password') }}
+    <p class="hint">Changing your password signs out every other device.</p>
+    <div class="actions"><button type="submit" class="btn btn-primary">Change password</button></div>
+  </form>
+</section>
+
+<section class="card" aria-labelledby="ses-h">
+  <div class="card-head"><h2 id="ses-h">Sessions</h2></div>
+  <p class="hint">Sign out of every other browser and device where you are signed in. You stay signed in here.</p>
+  <form method="post" action="{{ url_for('account.sign_out_everywhere') }}">{{ csrf() }}
+    <button type="submit" class="btn btn-secondary">Sign out of other devices</button></form>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/auth.js') }}"></script>{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon %}
+{% block title %}Administration – NeuroInsight{% endblock %}
+{% block page_title %}Administration{% endblock %}
+{% block content %}
+<h1 class="sr-only">Administration</h1>
+<div class="alert" role="note">Administrators manage <b>accounts only</b>. Cases, analyses, reports and notifications of users are not visible to administrators.</div>
+<section class="stat-grid" aria-label="Account statistics">
+  <article class="stat-card"><span class="stat-icon">{{ icon('users') }}</span><div><div class="stat-num" id="statUsers">{{ stats.users }}</div><div class="stat-lbl">Accounts</div></div></article>
+  <article class="stat-card"><span class="stat-icon">{{ icon('circle-check') }}</span><div><div class="stat-num" id="statActive">{{ stats.active }}</div><div class="stat-lbl">Active</div></div></article>
+  <article class="stat-card"><span class="stat-icon">{{ icon('circle-x') }}</span><div><div class="stat-num" id="statInactive">{{ stats.inactive }}</div><div class="stat-lbl">Deactivated</div></div></article>
+  <article class="stat-card"><span class="stat-icon">{{ icon('mail') }}</span><div><div class="stat-num" id="statUnverified">{{ stats.unverified }}</div><div class="stat-lbl">Email not confirmed</div></div></article>
+</section>
+<section class="card table-card" aria-labelledby="ra-h">
+  <div class="card-head pad"><h2 id="ra-h">Recent administrative actions</h2>
+    <div class="inline-filters"><a class="btn btn-secondary btn-sm" href="{{ url_for('admin.users') }}">Manage users</a>
+      <a class="btn btn-secondary btn-sm" href="{{ url_for('admin.audit') }}">Full audit log</a></div></div>
+  {% if recent %}
+  {% include "_audit_table.html" %}
+  {% else %}<div class="empty-state small">{{ icon('scroll-text', 'icon-xl') }}<b>No actions yet</b></div>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base_auth.html" %}
+{% from "_components.html" import icon %}
+{% block title %}{{ title }} – NeuroInsight{% endblock %}
+{% block auth_icon %}{{ icon('triangle-alert') }}{% endblock %}
+{% block auth_title %}{{ title }}{% endblock %}
+{% block auth_sub %}{{ message }}{% endblock %}
+{% block auth_body %}
+<p class="hint center-text">Error {{ status }}</p>
+<div class="actions center">
+  <a class="btn btn-primary" href="{{ url_for('landing') }}">Back to home</a>
+  <a class="btn btn-ghost" href="{{ url_for('dashboard.home') }}">Open the app</a>
+</div>
+{% endblock %}

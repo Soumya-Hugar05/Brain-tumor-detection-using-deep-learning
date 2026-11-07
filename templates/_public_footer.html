@@ -1,0 +1,35 @@
+{% from "_components.html" import icon, logo %}
+<footer class="pfooter">
+  <div class="wrap pfooter-grid">
+    <div class="pfooter-brand">
+      <a class="brand" href="{{ url_for('landing') }}#home" aria-label="NeuroInsight home page">
+        {{ logo() }}
+        <span class="brand-text"><span class="brand-name">NeuroInsight</span><span class="subtitle">Brain MRI Analysis Platform</span></span>
+      </a>
+      <p class="hint">A research prototype for classifying brain MRI slices with frozen ResNet50 features and an RBF support-vector machine.</p>
+    </div>
+    <nav aria-label="Platform">
+      <h2 class="pfooter-h">Platform</h2>
+      <ul>
+        <li><a href="{{ url_for('landing') }}#features">Features</a></li>
+        <li><a href="{{ url_for('landing') }}#how-it-works">How it works</a></li>
+        <li><a href="{{ url_for('landing') }}#model-information">Model information</a></li>
+        <li><a href="{{ url_for('analysis_page') }}">MRI analysis</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Account">
+      <h2 class="pfooter-h">Account</h2>
+      <ul>
+        <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+        <li><a href="{{ url_for('auth.signup') }}">Get started</a></li>
+        <li><a href="{{ url_for('public.terms') }}">Terms of use</a></li>
+        <li><a href="{{ url_for('public.privacy') }}">Privacy notice</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="wrap pfooter-legal">
+    <p>{{ disclaimer }} Not intended for medical diagnosis.</p>
+    <p class="hint">Grad-CAM explanations are disabled until they have been validated. Validation metrics are not clinical performance.</p>
+  </div>
+</footer>
+<div id="toasts" class="toasts" role="status" aria-live="polite" aria-atomic="false"></div>

@@ -1,0 +1,42 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon %}
+{% block title %}Model Performance – NeuroInsight{% endblock %}
+{% block page_title %}Model Performance{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card-head"><h1 class="h2">Phase B model</h1><span class="tag">Validation metrics · not clinical performance</span></div>
+  {% if info %}
+  {% set m = info.validation_metrics %}
+  <p class="hint">{{ info.architecture.summary }} {{ info.data.split }}.</p>
+  <div class="metric-grid">
+    <div class="metric"><div class="metric-value">{{ '%.2f' | format(m.accuracy * 100) }}%</div><div class="metric-label">Validation accuracy</div><div class="metric-sub">n = {{ m.n }}</div></div>
+    <div class="metric"><div class="metric-value">{{ '%.4f' | format(m.macro_f1) }}</div><div class="metric-label">Macro-F1</div><div class="metric-sub">average over 4 classes</div></div>
+    <div class="metric"><div class="metric-value">{{ '%.2f' | format(m.tumor_vs_notumor.sensitivity * 100) }}%</div><div class="metric-label">Tumor vs no-tumor sensitivity</div><div class="metric-sub">{{ m.tumor_vs_notumor.tp }} of {{ m.tumor_vs_notumor.tp + m.tumor_vs_notumor.fn }}</div></div>
+    <div class="metric"><div class="metric-value">{{ '%.2f' | format(m.tumor_vs_notumor.specificity * 100) }}%</div><div class="metric-label">Tumor vs no-tumor specificity</div><div class="metric-sub">{{ m.tumor_vs_notumor.tn }} of {{ m.tumor_vs_notumor.tn + m.tumor_vs_notumor.fp }}</div></div>
+  </div>
+</section>
+<div class="dash-grid">
+  <section class="card"><h2>By class</h2>
+    <div class="table-scroll"><table><thead><tr><th>Class</th><th class="num">Recall</th><th class="num">Precision</th><th class="num">F1</th><th class="num">n</th></tr></thead><tbody>
+    {% for key, v in m.per_class.items() %}<tr><td>{{ class_label.get(key, key) }}</td><td class="num">{{ '%.3f' | format(v.recall) }}</td><td class="num">{{ '%.3f' | format(v.precision) }}</td><td class="num">{{ '%.3f' | format(v.f1) }}</td><td class="num">{{ v.support }}</td></tr>{% endfor %}
+    </tbody></table></div>
+    <p class="hint">Calibration error (ECE) {{ '%.3f' | format(m.ece) }}.</p>
+  </section>
+  <section class="card"><h2>Confusion matrix</h2>
+    <div class="table-scroll"><table class="cm" id="confusionMatrix"><thead><tr><th>True / predicted</th>{% for c in info.architecture.classes %}<th class="num">{{ class_label.get(c, c) }}</th>{% endfor %}</tr></thead><tbody>
+    {% for row in m.confusion_matrix %}{% set ri = loop.index0 %}{% set total = row | sum %}<tr><th>{{ class_label.get(info.architecture.classes[ri]) }}</th>
+      {% for v in row %}<td class="num cm-cell{% if loop.index0 == ri %} diag{% endif %}" style="--v: {{ (v / total) if total else 0 }}">{{ v }}</td>{% endfor %}</tr>{% endfor %}
+    </tbody></table></div>
+    <p class="hint">Rows are the true class, columns the predicted class. Shading shows the share of each row.</p>
+  </section>
+  <section class="card"><h2>Confidence warnings</h2>
+    <ul class="tier-list">{% for t in info.confidence_warnings.tiers %}<li class="tier" data-level="{{ ['none','review','low'][loop.index0] }}"><b>{{ t.range }}</b><span>{{ 'No warning' if t.warning == 'none' else t.warning | capitalize }}</span></li>{% endfor %}</ul>
+    <p class="hint">{{ info.confidence_warnings.note }}</p>
+  </section>
+  <section class="card"><h2>Limitations</h2><ul class="limits">{% for item in info.limitations %}<li>{{ item }}</li>{% endfor %}</ul></section>
+</div>
+{% else %}
+  <p class="hint">The verified model metrics are currently unavailable.</p>
+</section>
+{% endif %}
+{% endblock %}

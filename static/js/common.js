@@ -15,7 +15,27 @@
     const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
     applyTheme(next);
     try { localStorage.setItem("neuroinsight-theme", next); } catch (_) { /* storage unavailable */ }
+    if (document.body.classList.contains("app-shell") && window.fetch)      // remember the choice on the account too
+      fetch("/api/account/theme", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ theme: next }) }).catch(() => {});
   });
+
+  /* ---------- CSRF: send the token with every same-origin state-changing fetch ---------- */
+  const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+  if (csrfMeta && window.fetch) {
+    const nativeFetch = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      init = init || {};
+      const method = String(init.method || (input && input.method) || "GET").toUpperCase();
+      const url = typeof input === "string" ? input : (input && input.url) || "";
+      const sameOrigin = url.startsWith("/") || url.startsWith(location.origin);
+      if (sameOrigin && !["GET", "HEAD", "OPTIONS"].includes(method)) {
+        const headers = new Headers(init.headers || (input && input.headers) || {});
+        headers.set("X-CSRFToken", csrfMeta.content);
+        init = Object.assign({}, init, { headers });
+      }
+      return nativeFetch(input, init);
+    };
+  }
 
   /* ---------- toasts ---------- */
   function toast(message, kind, ms) {

@@ -1,0 +1,44 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon, csrf %}
+{% block title %}Prediction History – NeuroInsight{% endblock %}
+{% block page_title %}Prediction History{% endblock %}
+{% block content %}
+<h1 class="sr-only">Prediction History</h1>
+<section class="card table-card" aria-labelledby="hist-h">
+  <div class="card-head pad"><h2 id="hist-h">Your analyses <span class="hint">({{ total }})</span></h2>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('analysis_page') }}">{{ icon('plus') }} New analysis</a></div>
+  <form method="get" class="inline-filters pad" role="search">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search file name" aria-label="Search file name" maxlength="60" />
+    <select name="cls" aria-label="Result">
+      <option value="">All results</option>
+      {% for c in classes %}<option value="{{ c }}"{% if cls == c %} selected{% endif %}>{{ class_label[c] }}</option>{% endfor %}
+    </select>
+    <select name="case" aria-label="Case">
+      <option value="">All cases</option>
+      <option value="none"{% if case_arg == 'none' %} selected{% endif %}>No case</option>
+      {% for c in all_cases %}<option value="{{ c.id }}"{% if case_arg == c.id | string %} selected{% endif %}>{{ c.case_code }}</option>{% endfor %}
+    </select>
+    <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+  </form>
+  {% if items %}
+  <div class="table-wrap"><table class="reports-table" id="historyTable">
+    <thead><tr><th>File</th><th>Result</th><th class="num">Confidence</th><th>When</th><th>Case</th></tr></thead>
+    <tbody>{% for p in items %}
+      <tr><td class="cell-file" title="{{ p.file_name }}">{{ p.file_name }}</td>
+          <td><span class="class-tag" data-class="{{ p.predicted_class }}">{{ class_label[p.predicted_class] }}</span></td>
+          <td class="num conf" data-level="{{ p.warning_level }}">{{ '%.2f' | format(p.confidence * 100) }}%</td>
+          <td>{{ p.created_at.strftime('%Y-%m-%d %H:%M') }} UTC</td>
+          <td><form method="post" action="{{ url_for('cases.assign_case', public_id=p.public_id) }}" class="case-assign">{{ csrf() }}
+            <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') }}" />
+            <select name="case_id" aria-label="Case for {{ p.file_name }}">
+              <option value="">No case</option>
+              {% for c in all_cases if c.status == 'open' or c.id == p.case_id %}<option value="{{ c.id }}"{% if p.case_id == c.id %} selected{% endif %}>{{ c.case_code }}</option>{% endfor %}
+            </select>
+            <button type="submit" class="act">Set</button></form></td></tr>{% endfor %}
+    </tbody></table></div>
+  {% include "_pager.html" %}
+  {% else %}
+  <div class="empty-state small">{{ icon('history', 'icon-xl') }}<b>{{ 'No matching analyses' if (q or cls or case_arg) else 'No analyses yet' }}</b><span class="hint">{{ 'Try different filters.' if (q or cls or case_arg) else 'Your analyses appear here after you run one.' }}</span></div>
+  {% endif %}
+</section>
+{% endblock %}

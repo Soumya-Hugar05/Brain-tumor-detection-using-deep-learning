@@ -1,0 +1,203 @@
+{% extends "base_public.html" %}
+{% from "_components.html" import icon %}
+{% block content %}
+
+<!-- Hero -->
+<section id="home" class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow-pill">{{ icon('microscope') }} Research platform</span>
+      <h1 class="hero-title">Intelligent Brain MRI Analysis</h1>
+      <p class="lead">NeuroInsight is a research platform that classifies brain MRI slices as glioma, meningioma, pituitary tumor or
+        no tumor. It combines frozen ResNet50 features with a support-vector machine and reports confidence-aware results
+        that you can download.</p>
+      <div class="actions">
+        <a class="btn btn-primary btn-lg" href="{{ url_for('analysis_page') }}">Explore Platform {{ icon('arrow-right') }}</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('auth.login') }}">Sign In</a>
+      </div>
+      <p class="hero-note">{{ icon('shield-check') }} Research prototype · not a medical device · not for diagnosis</p>
+    </div>
+    <figure class="hero-visual">
+      <div class="scan-frame">
+        <img src="{{ url_for('static', filename='samples/sample_notumor_1.jpg') }}" width="512" height="512"
+             alt="Example axial brain MRI slice (a demo sample from the validation split)" />
+        <span class="scan-line" aria-hidden="true"></span>
+        <span class="corner tl" aria-hidden="true"></span><span class="corner tr" aria-hidden="true"></span>
+        <span class="corner bl" aria-hidden="true"></span><span class="corner br" aria-hidden="true"></span>
+      </div>
+      <figcaption>Example MRI slice from the validation split (demo sample). Shown for illustration; it is not a prediction.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">About</span>
+      <h2 class="h2">A research platform, not a medical device</h2>
+    </div>
+    <div class="about-grid">
+      <p>NeuroInsight was built to study how well a classical machine-learning pipeline can separate four brain MRI categories.
+        An ImageNet-pretrained ResNet50 turns each image into a feature vector, and an RBF support-vector machine turns that
+        vector into class probabilities.</p>
+      <p>The model was trained and validated on an audited split of a public brain MRI dataset. The platform shows every class
+        probability, warns when the model is uncertain, and never presents a result as a diagnosis. It keeps analysis records, not
+        your images.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features" class="section section-alt">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Features</span>
+      <h2 class="h2">Everything needed to explore MRI classification</h2>
+    </div>
+    <div class="feature-grid">
+      <article class="feature">
+        <span class="feature-icon">{{ icon('brain') }}</span>
+        <h3>Brain tumor classification</h3>
+        <p>Four categories: glioma, meningioma, pituitary tumor and no tumor, from a single MRI slice.</p>
+      </article>
+      <article class="feature">
+        <span class="feature-icon">{{ icon('scan-line') }}</span>
+        <h3>MRI image analysis</h3>
+        <p>Drag-and-drop upload, validated JPG, PNG and BMP files, an image viewer with zoom, and eight validation-split demo samples.</p>
+      </article>
+      <article class="feature">
+        <span class="feature-icon">{{ icon('gauge') }}</span>
+        <h3>Confidence-based predictions</h3>
+        <p>All four class probabilities, plus a clear warning when the model is uncertain. Predictions are never hidden.</p>
+      </article>
+      <article class="feature">
+        <span class="feature-icon">{{ icon('file-down') }}</span>
+        <h3>Downloadable reports</h3>
+        <p>Save an analysis as a report and download it as PDF, JSON or PNG, with the model information included.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how-it-works" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2 class="h2">From an MRI slice to a prediction</h2>
+    </div>
+    <ol class="steps">
+      <li><span class="step-num">1</span><span class="step-icon">{{ icon('upload') }}</span><h3>MRI Upload</h3><p>A validated JPG, PNG or BMP image, up to 10 MB.</p></li>
+      <li><span class="step-num">2</span><span class="step-icon">{{ icon('image') }}</span><h3>Preprocessing</h3><p>Decoded as RGB and resized to 224×224 pixels.</p></li>
+      <li><span class="step-num">3</span><span class="step-icon">{{ icon('layers') }}</span><h3>ResNet50 Feature Extraction</h3><p>A frozen ImageNet ResNet50 produces 2048 features.</p></li>
+      <li><span class="step-num">4</span><span class="step-icon">{{ icon('workflow') }}</span><h3>SVM Classification</h3><p>An RBF SVM turns the features into class probabilities.</p></li>
+      <li><span class="step-num">5</span><span class="step-icon">{{ icon('circle-check') }}</span><h3>Prediction</h3><p>The most probable class, its confidence and a warning when needed.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- Technology -->
+<section id="technology" class="section section-alt">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Technology</span>
+      <h2 class="h2">Built with open-source tools</h2>
+    </div>
+    <div class="tech-grid">
+      <article class="tech"><span class="feature-icon">{{ icon('code-xml') }}</span><h3>Python</h3><p>Data pipeline, services and tests.</p></article>
+      <article class="tech"><span class="feature-icon">{{ icon('server') }}</span><h3>Flask</h3><p>Web application, JSON API and report generation.</p></article>
+      <article class="tech"><span class="feature-icon">{{ icon('cpu') }}</span><h3>TensorFlow</h3><p>Runs the frozen ResNet50 feature extractor.</p></article>
+      <article class="tech"><span class="feature-icon">{{ icon('layers') }}</span><h3>ResNet50</h3><p>ImageNet-pretrained network, used frozen without fine-tuning.</p></article>
+      <article class="tech"><span class="feature-icon">{{ icon('workflow') }}</span><h3>SVM</h3><p>RBF support-vector machine with Platt-scaled probabilities.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- Research performance (real values from the Phase B results file) -->
+<section id="model-information" class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Model information</span>
+      <h2 class="h2">Research performance</h2>
+      <p class="hint">Validation-split results of the selected Phase B model. These are research validation metrics, not clinical performance.</p>
+    </div>
+    {% if info %}
+      {% set m = info.validation_metrics %}
+      <div class="metric-grid">
+        <div class="metric"><div class="metric-value">{{ '%.2f' | format(m.accuracy * 100) }}%</div><div class="metric-label">Validation accuracy</div><div class="metric-sub">n = {{ m.n }} validation images</div></div>
+        <div class="metric"><div class="metric-value">{{ '%.4f' | format(m.macro_f1) }}</div><div class="metric-label">Macro-F1</div><div class="metric-sub">average over the 4 classes</div></div>
+        <div class="metric"><div class="metric-value">{{ '%.2f' | format(m.tumor_vs_notumor.sensitivity * 100) }}%</div><div class="metric-label">Tumor vs no-tumor sensitivity</div><div class="metric-sub">{{ m.tumor_vs_notumor.tp }} of {{ m.tumor_vs_notumor.tp + m.tumor_vs_notumor.fn }} tumor images found</div></div>
+        <div class="metric"><div class="metric-value">{{ '%.2f' | format(m.tumor_vs_notumor.specificity * 100) }}%</div><div class="metric-label">Tumor vs no-tumor specificity</div><div class="metric-sub">{{ m.tumor_vs_notumor.tn }} of {{ m.tumor_vs_notumor.tn + m.tumor_vs_notumor.fp }} no-tumor images correct</div></div>
+      </div>
+      <div class="perf-grid">
+        <div class="card">
+          <h3>Validation performance by class</h3>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Class</th><th class="num">Recall</th><th class="num">Precision</th><th class="num">F1</th><th class="num">n</th></tr></thead>
+              <tbody>
+              {% for key, v in m.per_class.items() %}
+                <tr><td>{{ class_label.get(key, key) }}</td><td class="num">{{ '%.3f' | format(v.recall) }}</td><td class="num">{{ '%.3f' | format(v.precision) }}</td><td class="num">{{ '%.3f' | format(v.f1) }}</td><td class="num">{{ v.support }}</td></tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <p class="hint">Validation split only. It was also used to choose the model, and the held-out test split has not been evaluated.</p>
+        </div>
+        <div class="card">
+          <h3>Confidence warnings</h3>
+          <ul class="tier-list">
+            {% for t in info.confidence_warnings.tiers %}
+              <li class="tier" data-level="{{ ['none','review','low'][loop.index0] }}"><b>{{ t.range }}</b><span>{{ 'No warning' if t.warning == 'none' else t.warning | capitalize }}</span></li>
+            {% endfor %}
+          </ul>
+          <p class="hint">{{ info.confidence_warnings.note }}</p>
+        </div>
+      </div>
+    {% else %}
+      <div class="card"><p class="hint">The verified model metrics are currently unavailable.</p></div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Limitations and disclaimer -->
+<section id="limitations" class="section section-alt">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Limitations</span>
+      <h2 class="h2">Research limitations and disclaimer</h2>
+    </div>
+    <div class="limits-grid">
+      <div class="card">
+        <h3>Known limitations</h3>
+        {% if info %}
+          <ul class="limits">{% for item in info.limitations %}<li>{{ item }}</li>{% endfor %}</ul>
+        {% else %}
+          <p class="hint">The limitation list is currently unavailable. NeuroInsight is a research prototype and is not validated for clinical use.</p>
+        {% endif %}
+      </div>
+      <div class="notice">
+        <span class="notice-icon">{{ icon('triangle-alert') }}</span>
+        <h3>Disclaimer</h3>
+        <p>{{ disclaimer }}</p>
+        <p>It makes no clinical claims. Results are model outputs for research demonstration and must never replace the judgement of a qualified professional.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to action -->
+<section class="section cta">
+  <div class="wrap cta-inner">
+    <div>
+      <h2 class="h2">Try the analysis</h2>
+      <p class="hint">Upload an MRI slice or start from a validation-split demo sample.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-primary btn-lg" href="{{ url_for('analysis_page') }}">Explore Platform {{ icon('arrow-right') }}</a>
+      <a class="btn btn-secondary btn-lg" href="{{ url_for('auth.signup') }}">Get Started</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

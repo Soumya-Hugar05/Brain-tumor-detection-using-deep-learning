@@ -1,0 +1,12 @@
+{% extends "base_auth.html" %}
+{% from "_components.html" import icon, csrf %}
+{% block title %}Confirm email – NeuroInsight{% endblock %}
+{% block auth_icon %}{{ icon('circle-check') }}{% endblock %}
+{% block auth_title %}Confirm your email{% endblock %}
+{% block auth_sub %}One more click to activate your account.{% endblock %}
+{% block auth_body %}
+<form method="post" action="{{ url_for('auth.verify_confirm', token=token) }}" class="auth-form" data-once>
+  {{ csrf() }}
+  <button type="submit" class="btn btn-primary btn-block">Confirm my email address</button>
+</form>
+{% endblock %}

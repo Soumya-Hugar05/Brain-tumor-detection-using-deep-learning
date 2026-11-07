@@ -4,7 +4,7 @@
   const $ = (id) => document.getElementById(id);
   const el = {
     q: $("q"), filterBtn: $("filterBtn"), filterLabel: $("filterLabel"), filters: $("filters"), exportBtn: $("exportBtn"),
-    fClass: $("fClass"), fFrom: $("fFrom"), fTo: $("fTo"), fSort: $("fSort"), fSize: $("fSize"), clearFilters: $("clearFilters"),
+    fClass: $("fClass"), fCase: $("fCase"), fFrom: $("fFrom"), fTo: $("fTo"), fSort: $("fSort"), fSize: $("fSize"), clearFilters: $("clearFilters"),
     statTotal: $("statTotal"), statToday: $("statToday"), statMonth: $("statMonth"),
     loading: $("loading"), errorBox: $("errorBox"), emptyAll: $("emptyAll"), emptyFiltered: $("emptyFiltered"), emptyClear: $("emptyClear"),
     tableWrap: $("tableWrap"), rows: $("rows"), sortDate: $("sortDate"), sortArrow: $("sortArrow"), dateTh: $("dateTh"),
@@ -17,7 +17,7 @@
   const nice = (c) => CLASS_LABEL[c] || c;
   const pct = (x, d = 2) => (x * 100).toFixed(d) + "%";
   const TZ = new Date().getTimezoneOffset();             // minutes, UTC minus local: "today" and date filters use your local days
-  const state = { q: "", cls: "", from: "", to: "", sort: "newest", page: 1, pageSize: 10 };
+  const state = { q: "", cls: "", case: "", from: "", to: "", sort: "newest", page: 1, pageSize: 10 };
   let reqId = 0, lastTotal = 0, preview = null, previewOpener = null;
 
   function node(tag, props, children) {
@@ -28,13 +28,14 @@
   }
   const localTime = (iso) => new Date(iso).toLocaleString([], { year: "numeric", month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" });
   const utcTime = (iso) => iso.replace("T", " ").replace("Z", " UTC");
-  const hasFilters = () => !!(state.q || state.cls || state.from || state.to);
+  const hasFilters = () => !!(state.q || state.cls || state.case || state.from || state.to);
 
   /* ---------- loading the list ---------- */
   function queryString(extra) {
     const p = new URLSearchParams({ sort: state.sort, page: String(state.page), page_size: String(state.pageSize), tz_offset: String(TZ) });
     if (state.q) p.set("q", state.q);
     if (state.cls) p.set("cls", state.cls);
+    if (state.case) p.set("case", state.case);
     if (state.from) p.set("date_from", state.from);
     if (state.to) p.set("date_to", state.to);
     Object.entries(extra || {}).forEach(([k, v]) => p.set(k, v));
@@ -79,7 +80,7 @@
       if (r.warning_level !== "none") conf.setAttribute("title", r.warning_level === "low" ? "Low confidence" : "Review recommended");
       return node("tr", {}, [
         node("td", { "data-label": "Report ID" }, [node("span", { class: "mono", text: r.report_id })]),
-        node("td", { "data-label": "Case ID" }, [node("span", { class: "muted", title: "No case or patient information is collected", text: "—" })]),
+        node("td", { "data-label": "Case" }, [r.case_code ? node("span", { class: "mono", text: r.case_code }) : node("span", { class: "muted", title: "Not part of a case", text: "—" })]),
         node("td", { "data-label": "MRI image" }, [node("span", { class: "cell-file", title: r.file_name, text: r.file_name })]),
         node("td", { "data-label": "Predicted class" }, [node("span", { class: "class-tag", "data-class": r.predicted_class, text: nice(r.predicted_class) })]),
         node("td", { class: "num", "data-label": "Confidence" }, [conf]),
@@ -105,7 +106,7 @@
   }
   function applyControls() {
     const prevFrom = state.from, prevTo = state.to;
-    state.cls = el.fClass.value; state.from = el.fFrom.value; state.to = el.fTo.value; state.sort = el.fSort.value;
+    state.cls = el.fClass.value; state.case = el.fCase.value; state.from = el.fFrom.value; state.to = el.fTo.value; state.sort = el.fSort.value;
     state.pageSize = parseInt(el.fSize.value, 10) || 10; state.page = 1;
     if (state.from && state.to && state.from > state.to) {
       NI.toast("The start date is after the end date.", "error");
@@ -113,7 +114,7 @@
     }
     syncSortUi(); updateFilterLabel(); load();
   }
-  [el.fClass, el.fFrom, el.fTo, el.fSort, el.fSize].forEach((c) => c.addEventListener("change", applyControls));
+  [el.fClass, el.fCase, el.fFrom, el.fTo, el.fSort, el.fSize].forEach((c) => c.addEventListener("change", applyControls));
   function syncSortUi() {
     el.fSort.value = state.sort;
     el.sortArrow.textContent = state.sort === "newest" ? "↓" : "↑";
@@ -121,8 +122,8 @@
   }
   el.sortDate.addEventListener("click", () => { state.sort = state.sort === "newest" ? "oldest" : "newest"; state.page = 1; syncSortUi(); load(); });
   function clearAll() {
-    Object.assign(state, { q: "", cls: "", from: "", to: "", page: 1 });
-    el.q.value = ""; el.fClass.value = ""; el.fFrom.value = ""; el.fTo.value = "";
+    Object.assign(state, { q: "", cls: "", case: "", from: "", to: "", page: 1 });
+    el.q.value = ""; el.fClass.value = ""; el.fCase.value = ""; el.fFrom.value = ""; el.fTo.value = "";
     updateFilterLabel(); load();
   }
   el.clearFilters.addEventListener("click", clearAll);
@@ -194,7 +195,7 @@
       node("div", { class: "rs-strip", text: "Research prototype – not a medical diagnostic report. Not for clinical use." }),
       node("div", { class: "rs-body" }, [
         section("Report information", kv([["Report ID", r.report_id, true], ["Generated", utcTime(r.created_at) + "  (" + localTime(r.created_at) + " local)"],
-          ["Case ID", "Not available (no patient information is collected)"], ["Image file", r.file_name], ["Prediction ID", r.prediction_id, true]])),
+          ["Case", r.case_code || "None"], ["Image file", r.file_name], ["Prediction ID", r.prediction_id, true]])),
         section("MRI analysis", node("div", { class: "rs-analysis" }, [
           node("div", { class: "rs-image" }, [node("span", { text: "Original MRI image is not stored with reports" })]),
           node("div", {}, [node("div", { class: "rs-eyebrow", text: "Predicted category" }), node("div", { class: "rs-class", text: nice(p.label) }),

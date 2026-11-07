@@ -1,0 +1,75 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon, field, csrf %}
+{% block title %}Case {{ case.case_code }} – NeuroInsight{% endblock %}
+{% block page_title %}Case {{ case.case_code }}{% endblock %}
+{% block content %}
+<p><a class="link" href="{{ url_for('cases.cases') }}">← All cases</a></p>
+
+<section class="card" aria-labelledby="case-h">
+  <div class="card-head"><h1 class="h2" id="case-h">{{ case.case_code }} <span class="chip">{{ case.status }}</span></h1>
+    <form method="post" action="{{ url_for('cases.set_case_status', case_id=case.id) }}">{{ csrf() }}
+      <input type="hidden" name="status" value="{{ 'open' if case.status == 'archived' else 'archived' }}" />
+      <button type="submit" class="btn btn-secondary btn-sm">{{ 'Reopen case' if case.status == 'archived' else 'Archive case' }}</button>
+    </form>
+  </div>
+  <p class="hint">Created {{ case.created_at.strftime('%Y-%m-%d %H:%M') }} UTC. Do not enter identifying information.</p>
+  <form method="post" action="{{ url_for('cases.edit_case', case_id=case.id) }}" class="stack-form" novalidate>
+    {{ csrf() }}
+    {{ field('case_code', 'Case code', value=form.get('case_code', ''), errors=errors, maxlength=40) }}
+    {{ field('title', 'Title', value=form.get('title', ''), errors=errors, required=false, maxlength=max_title) }}
+    <div class="field-block{% if errors.get('notes') %} has-error{% endif %}">
+      <label for="f-notes">Notes <span class="opt">(optional)</span></label>
+      <textarea id="f-notes" name="notes" rows="4" maxlength="{{ max_notes }}">{{ form.get('notes', '') }}</textarea>
+      {% if errors.get('notes') %}<ul class="field-errors">{% for m in errors['notes'] %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    <div class="actions"><button type="submit" class="btn btn-primary">Save changes</button></div>
+  </form>
+</section>
+
+<section class="card table-card" aria-labelledby="cp-h">
+  <div class="card-head pad"><h2 id="cp-h">Analyses in this case <span class="hint">({{ preds | length }})</span></h2>
+    <a class="btn btn-secondary btn-sm" href="{{ url_for('analysis_page') }}?case={{ case.id }}">{{ icon('plus') }} New analysis</a></div>
+  {% if preds %}
+  <div class="table-wrap"><table class="reports-table" id="caseAnalyses">
+    <thead><tr><th>File</th><th>Result</th><th class="num">Confidence</th><th>When</th><th></th></tr></thead>
+    <tbody>{% for p in preds %}
+      <tr><td class="cell-file" title="{{ p.file_name }}">{{ p.file_name }}</td>
+          <td><span class="class-tag" data-class="{{ p.predicted_class }}">{{ class_label[p.predicted_class] }}</span></td>
+          <td class="num conf" data-level="{{ p.warning_level }}">{{ '%.2f' | format(p.confidence * 100) }}%</td>
+          <td>{{ p.created_at.strftime('%Y-%m-%d %H:%M') }} UTC</td>
+          <td><form method="post" action="{{ url_for('cases.assign_case', public_id=p.public_id) }}">{{ csrf() }}
+            <input type="hidden" name="case_id" value="" /><input type="hidden" name="next" value="{{ request.path }}" />
+            <button type="submit" class="act">Remove from case</button></form></td></tr>{% endfor %}
+    </tbody></table></div>
+  {% else %}
+  <div class="empty-state small">{{ icon('scan-line', 'icon-xl') }}<b>No analyses in this case</b><span class="hint">Run an analysis for this case, or add one from your <a class="link" href="{{ url_for('cases.history') }}">history</a>.</span></div>
+  {% endif %}
+</section>
+
+<section class="card table-card" aria-labelledby="cr-h">
+  <div class="card-head pad"><h2 id="cr-h">Reports for this case <span class="hint">({{ reports | length }})</span></h2>
+    <a class="btn btn-secondary btn-sm" href="{{ url_for('reports_page') }}">{{ icon('file-text') }} All reports</a></div>
+  {% if reports %}
+  <div class="table-wrap"><table class="reports-table" id="caseReports">
+    <thead><tr><th>Report ID</th><th>File</th><th>Result</th><th class="num">Confidence</th><th>Generated</th></tr></thead>
+    <tbody>{% for r in reports %}
+      <tr><td><a class="link mono" href="{{ url_for('reports_page') }}?view={{ r.report_id }}">{{ r.report_id }}</a></td>
+          <td class="cell-file" title="{{ r.file_name }}">{{ r.file_name }}</td>
+          <td><span class="class-tag" data-class="{{ r.predicted_class }}">{{ class_label[r.predicted_class] }}</span></td>
+          <td class="num conf" data-level="{{ r.warning_level }}">{{ '%.2f' | format(r.confidence * 100) }}%</td>
+          <td>{{ r.created_at.replace('T', ' ').replace('Z', ' UTC') }}</td></tr>{% endfor %}
+    </tbody></table></div>
+  {% else %}
+  <div class="empty-state small">{{ icon('file-text', 'icon-xl') }}<b>No reports for this case</b><span class="hint">Save an analysis from this case to Reports and it appears here.</span></div>
+  {% endif %}
+</section>
+
+<section class="card" aria-labelledby="del-h">
+  <h2 id="del-h" class="h3">Delete case</h2>
+  <details class="danger-zone"><summary>Delete this case…</summary>
+    <p class="hint">The case and its notes are removed permanently. Its analyses and reports stay in your history and Reports, unassigned.</p>
+    <form method="post" action="{{ url_for('cases.delete_case', case_id=case.id) }}">{{ csrf() }}
+      <button type="submit" class="btn btn-danger btn-sm">Yes, delete case {{ case.case_code }}</button></form>
+  </details>
+</section>
+{% endblock %}

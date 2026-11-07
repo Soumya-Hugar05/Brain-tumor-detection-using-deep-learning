@@ -1,0 +1,17 @@
+{% extends "base_auth.html" %}
+{% from "_components.html" import icon, csrf %}
+{% block title %}Confirm your email – NeuroInsight{% endblock %}
+{% block auth_icon %}{{ icon('mail') }}{% endblock %}
+{% block auth_title %}Confirm your email address{% endblock %}
+{% block auth_sub %}We sent a confirmation link to <b>{{ email }}</b>. Open it to unlock the platform.{% endblock %}
+{% block auth_body %}
+<p class="hint">Until your address is confirmed you cannot use MRI analysis, cases or reports. The link works once and expires in 24 hours.</p>
+<form method="post" action="{{ url_for('auth.resend_verification') }}" class="auth-form" data-once>
+  {{ csrf() }}
+  <button type="submit" class="btn btn-secondary btn-block">Send a new link</button>
+</form>
+<form method="post" action="{{ url_for('auth.logout') }}" class="auth-form">
+  {{ csrf() }}
+  <button type="submit" class="btn btn-ghost btn-block">Sign out</button>
+</form>
+{% endblock %}

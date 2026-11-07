@@ -1,0 +1,34 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon, field, csrf %}
+{% block title %}My Profile – NeuroInsight{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<section class="card profile-card">
+  <div class="profile-head"><span class="avatar avatar-lg" aria-hidden="true">{{ (current_user.full_name or '?')[:1] | upper }}</span>
+    <div><h1 class="h2">{{ current_user.full_name }}</h1><p class="hint">{{ current_user.email }}</p></div></div>
+  <dl class="kv">
+    <dt>Email</dt><dd>{{ current_user.email }} {% if current_user.is_verified %}<span class="chip ok">Verified</span>{% endif %}</dd>
+    <dt>Account role</dt><dd>{{ current_user.role | capitalize }}</dd>
+    <dt>Member since</dt><dd>{{ current_user.created_at.strftime('%Y-%m-%d') }}</dd>
+  </dl>
+</section>
+
+<section class="card" aria-labelledby="edit-h">
+  <div class="card-head"><h2 id="edit-h">Edit profile</h2></div>
+  <form method="post" action="{{ url_for('account.update_profile') }}" class="stack-form" novalidate>
+    {{ csrf() }}
+    {{ field('full_name', 'Full name', value=values.get('full_name', ''), errors=errors, autocomplete='name', maxlength=100) }}
+    {{ field('institution', 'Institution', value=values.get('institution', ''), errors=errors, required=false, autocomplete='organization', maxlength=150) }}
+    <div class="field-block{% if errors.get('occupation') %} has-error{% endif %}">
+      <label for="f-occupation">I am a… <span class="opt">(optional)</span></label>
+      <select id="f-occupation" name="occupation">
+        <option value="">Prefer not to say</option>
+        {% for o in occupations %}<option value="{{ o }}"{% if values.get('occupation') == o %} selected{% endif %}>{{ o }}</option>{% endfor %}
+      </select>
+      {% if errors.get('occupation') %}<ul class="field-errors">{% for m in errors['occupation'] %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    <p class="hint">Your email address and role cannot be changed here. The occupation is a label only and grants no permissions.</p>
+    <div class="actions"><button type="submit" class="btn btn-primary">Save profile</button></div>
+  </form>
+</section>
+{% endblock %}

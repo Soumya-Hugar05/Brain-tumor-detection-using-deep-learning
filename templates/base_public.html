@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>{% block title %}NeuroInsight – Brain MRI Analysis Platform{% endblock %}</title>
+    <meta name="description" content="{% block description %}NeuroInsight is a research prototype for brain MRI classification with frozen ResNet50 features and an RBF SVM. Not a medical device.{% endblock %}" />
+    {% include "_theme_init.html" %}
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}" />
+    <link rel="preload" href="{{ url_for('static', filename='fonts/inter-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}" />
+  </head>
+  <body class="public">
+    <a class="skip" href="#main">Skip to main content</a>
+    {% include "_public_nav.html" %}
+    <main id="main">
+      {% block content %}{% endblock %}
+    </main>
+    {% include "_public_footer.html" %}
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

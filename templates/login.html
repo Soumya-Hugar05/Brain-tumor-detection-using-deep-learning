@@ -1,0 +1,19 @@
+{% extends "base_auth.html" %}
+{% from "_components.html" import icon, field, password_field, csrf %}
+{% block title %}Sign in – NeuroInsight{% endblock %}
+{% block auth_title %}Welcome back{% endblock %}
+{% block auth_sub %}Sign in to your NeuroInsight account.{% endblock %}
+{% block auth_body %}
+<form method="post" action="{{ url_for('auth.login') }}" class="auth-form" novalidate data-once>
+  {{ csrf() }}
+  {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}" />{% endif %}
+  {{ field('email', 'Email', 'email', email, none, 'email', maxlength=254) }}
+  {{ password_field('password', 'Password') }}
+  <div class="row-between">
+    <label class="check"><input type="checkbox" name="remember" /> <span>Remember me</span></label>
+    <a class="link" href="{{ url_for('auth.forgot_password') }}">Forgot password?</a>
+  </div>
+  <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+</form>
+{% endblock %}
+{% block auth_after %}<p class="auth-alt">New to NeuroInsight? <a class="link" href="{{ url_for('auth.signup') }}">Create an account</a></p>{% endblock %}

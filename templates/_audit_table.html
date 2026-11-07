@@ -1,0 +1,9 @@
+{# Needs: rows (list of AuditLog) and names (user id -> email). #}
+{% set rows = items if items is defined else recent %}
+<div class="table-wrap"><table class="reports-table" id="auditTable">
+  <thead><tr><th>When (UTC)</th><th>Administrator</th><th>Action</th><th>Account</th></tr></thead>
+  <tbody>{% for r in rows %}
+    <tr><td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td>{{ names.get(r.actor_id, 'deleted account') }}</td>
+        <td><span class="chip">{{ r.action | replace('_', ' ') }}</span></td>
+        <td>{% if r.target_id and names.get(r.target_id) %}<a class="link" href="{{ url_for('admin.user_detail', user_id=r.target_id) }}">{{ names[r.target_id] }}</a>{% else %}—{% endif %}</td></tr>{% endfor %}
+  </tbody></table></div>

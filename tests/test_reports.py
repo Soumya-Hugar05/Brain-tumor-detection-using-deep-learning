@@ -23,6 +23,7 @@ sys.path.insert(0, str(ROOT))
 
 from PIL import Image
 
+import helpers  # noqa: F401  (must come before `import app`)
 import app as appmod
 import reports as rpt
 
@@ -35,19 +36,18 @@ class _Db:
     """A fresh temporary report database wired into the app for the duration of a with-block."""
     def __enter__(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.path = Path(self.tmp.name) / "reports.sqlite3"
-        appmod.app.config["REPORTS_DB"] = str(self.path)
-        self.client = appmod.app.test_client()
+        self.path = helpers.TMP / "test.sqlite3"          # reports live in the main application database
+        helpers.reset_db()
+        self.user_id = helpers.create_user("tester@example.com")
+        self.client = _USER_CLIENT
         return self
 
     def __exit__(self, *exc):
-        appmod.app.config["REPORTS_DB"] = None
-        appmod.app.extensions.pop("report_store", None)
         self.tmp.cleanup()
 
     @property
     def store(self):
-        return appmod.report_store()
+        return _UserStore(appmod.report_store(), self.user_id)
 
     def sql(self, query, args=()):
         con = sqlite3.connect(self.path)
@@ -58,14 +58,29 @@ class _Db:
             con.close()
 
 
+_USER_CLIENT = helpers.logged_in_client("tester@example.com")
+
+
+class _UserStore:
+    """The report store, always acting for one user (the test user)."""
+    def __init__(self, store, user_id):
+        self._s, self._u = store, user_id
+
+    def create(self, pred):
+        return self._s.create(pred, self._u)
+
+    def get(self, rid):
+        return self._s.get(rid, self._u)
+
+
 def predict(sample_index=0, filename=None):
     """Run a real demo sample through /api/predict (model loaded once; results cached per sample for speed)."""
     key = (sample_index, filename)
     if key not in _predictions:
         s = SAMPLES[sample_index]
         data = (ROOT / "static" / "samples" / s["file"]).read_bytes()
-        r = appmod.app.test_client().post("/api/predict", data={"file": (io.BytesIO(data), filename or s["file"])},
-                                          content_type="multipart/form-data")
+        r = _USER_CLIENT.post("/api/predict", data={"file": (io.BytesIO(data), filename or s["file"])},
+                              content_type="multipart/form-data")
         assert r.status_code == 200, r.get_data(as_text=True)
         _predictions[key] = r.get_json()
     return _predictions[key]
@@ -128,23 +143,23 @@ def test_list_parameter_validation():
 # ---- pages ---------------------------------------------------------------------------------------------
 def test_reports_page_structure_and_no_hardcoded_statistics():
     with _Db() as db:
-        r = db.client.get("/reports")
+        r = db.client.get("/app/reports")
         html = r.get_data(as_text=True)
     assert r.status_code == 200
     for needle in ("Manage and download MRI analysis reports.", 'id="q"', 'id="filterBtn"', 'id="exportBtn"', "Total reports",
-                   "Generated today", "Generated this month", "Report ID", "Case ID", "MRI image", "Predicted class", "Confidence",
+                   "Generated today", "Generated this month", "Report ID", "Case", "MRI image", "Predicted class", "Confidence",
                    "Date generated", "Actions", "No reports yet", "Research prototype", "not a medical device", 'aria-current="page"',
                    'id="toasts"', "reports.js", "common.js"):
         assert needle in html, needle
     for stat in re.findall(r'id="stat(?:Total|Today|Month)">([^<]*)<', html):
         assert not stat.strip().isdigit(), "statistics must come from the API, not the HTML"
-    assert 'href="/reports"' in html and 'href="/"' in html
+    assert 'href="/app/reports"' in html and 'href="/app"' in html and 'href="/app/analysis"' in html
     print("ok Reports page: structure, nav, empty state markup, no hard-coded statistics")
 
 
 def test_index_page_has_nav_and_report_buttons():
-    html = appmod.app.test_client().get("/").get_data(as_text=True)
-    for needle in ('id="dlJson"', 'id="dlPng"', 'id="dlPdf"', 'id="saveReport"', 'href="/reports"', "common.js", "app.js"):
+    html = _USER_CLIENT.get("/app/analysis").get_data(as_text=True)
+    for needle in ('id="dlJson"', 'id="dlPng"', 'id="dlPdf"', 'id="saveReport"', 'href="/app/reports"', "common.js", "app.js"):
         assert needle in html, needle
     assert html.count("<h1") == 1
     print("ok analysis page keeps JSON/PNG buttons and adds Save + PDF")
@@ -388,15 +403,16 @@ def test_invalid_ids_traversal_and_methods_are_rejected_safely():
 
 def test_storage_failure_does_not_leak_paths():
     with _Db() as db:
+        import sqlalchemy as sa
+        from unittest import mock
+        from webapp.report_store import DbReportStore
         c = db.client
-        db.store  # create the store
-        db.path.unlink()
-        db.path.mkdir()                       # the database file is now a directory: every query fails
-        r = c.get("/api/reports")
+        boom = sa.exc.OperationalError("SELECT 1", {}, Exception(f"unable to open database file {db.path}"))
+        with mock.patch.object(DbReportStore, "list", side_effect=boom), mock.patch.object(DbReportStore, "stats", side_effect=boom):
+            r = c.get("/api/reports")
         text = r.get_data(as_text=True)
         assert r.status_code == 503 and r.get_json()["error"] == "Reports storage is unavailable."
         assert str(db.path) not in text and str(ROOT) not in text and "sqlite" not in text.lower()
-        db.path.rmdir()
     print("ok storage errors give a generic message (no file system paths)")
 
 
@@ -435,25 +451,15 @@ def test_privacy_nothing_but_metadata_is_stored():
     with _Db() as db:
         save(db.client, j)
         cols = [r[1] for r in db.sql("PRAGMA table_info(reports)")]
-        assert cols == ["report_id", "prediction_id", "file_name", "predicted_class", "confidence", "probabilities", "warning_level",
-                        "warning_message", "created_at", "model_json"], cols
+        assert cols == ["id", "report_id", "prediction_id", "user_id", "case_id", "file_name", "predicted_class", "confidence",
+                        "probabilities", "warning_level", "warning_message", "created_at", "model_json"], cols
         raw = db.path.read_bytes()
         assert sample[:200] not in raw and b"\xff\xd8\xff" not in raw, "image bytes must never be stored"
-        for table in ("patient", "case", "image"):
+        for table in ("patient", "image"):
             assert not db.sql("SELECT name FROM sqlite_master WHERE name LIKE ?", (f"%{table}%",))
     gi = (ROOT / ".gitignore").read_text(encoding="utf-8")
     assert re.search(r"^instance/$", gi, re.M), "the report database folder must be ignored by Git"
     print("ok only metadata columns exist; no image bytes in the database; instance/ is git-ignored")
-
-
-def test_no_authentication_exists_and_the_dependency_is_documented():
-    rules = {r.rule for r in appmod.app.url_map.iter_rules()}
-    assert not any(x in rules for x in ("/login", "/logout", "/api/login")), "no auth routes are expected in this app"
-    src = (ROOT / "app.py").read_text(encoding="utf-8")
-    assert "login_required" not in src and "session[" not in src
-    readme = (ROOT / "README.md").read_text(encoding="utf-8").lower()
-    assert "no authentication" in readme and "reports" in readme
-    print("ok no authentication exists (so none is simulated); the README states the dependency")
 
 
 def test_reports_code_does_not_touch_models_or_the_test_split():

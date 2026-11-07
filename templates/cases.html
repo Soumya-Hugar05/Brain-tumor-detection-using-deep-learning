@@ -1,0 +1,49 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon, field, csrf %}
+{% block title %}Patients / Cases – NeuroInsight{% endblock %}
+{% block page_title %}Patients / Cases{% endblock %}
+{% block content %}
+<h1 class="sr-only">Patients / Cases</h1>
+
+<section class="card" aria-labelledby="new-case-h">
+  <div class="card-head"><h2 id="new-case-h">New case</h2></div>
+  <p class="hint">A case groups related analyses under a code you choose. <b>Do not enter names, dates of birth, record numbers or any other identifying information</b>, in the code, title or notes.</p>
+  <form method="post" action="{{ url_for('cases.create_case') }}" class="stack-form" novalidate>
+    {{ csrf() }}
+    {{ field('case_code', 'Case code', value=form.get('case_code', ''), errors=errors, maxlength=40, hint='For example CASE-001 or STUDY-A/12.') }}
+    {{ field('title', 'Title', value=form.get('title', ''), errors=errors, required=false, maxlength=max_title) }}
+    <div class="field-block{% if errors.get('notes') %} has-error{% endif %}">
+      <label for="f-notes">Notes <span class="opt">(optional)</span></label>
+      <textarea id="f-notes" name="notes" rows="3" maxlength="{{ max_notes }}">{{ form.get('notes', '') }}</textarea>
+      {% if errors.get('notes') %}<ul class="field-errors">{% for m in errors['notes'] %}<li>{{ m }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    <div class="actions"><button type="submit" class="btn btn-primary">{{ icon('plus') }} Create case</button></div>
+  </form>
+</section>
+
+<section class="card table-card" aria-labelledby="cases-h">
+  <div class="card-head pad"><h2 id="cases-h">Your cases <span class="hint">({{ total }})</span></h2>
+    <form method="get" class="inline-filters" role="search">
+      <input type="search" name="q" value="{{ q }}" placeholder="Search code or title" aria-label="Search cases" maxlength="60" />
+      <select name="status" aria-label="Status">
+        <option value="">All statuses</option>
+        <option value="open"{% if status == 'open' %} selected{% endif %}>Open</option>
+        <option value="archived"{% if status == 'archived' %} selected{% endif %}>Archived</option>
+      </select>
+      <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
+    </form>
+  </div>
+  {% if items %}
+  <div class="table-wrap"><table class="reports-table" id="casesTable">
+    <thead><tr><th>Code</th><th>Title</th><th>Status</th><th class="num">Analyses</th><th>Created</th></tr></thead>
+    <tbody>{% for c in items %}
+      <tr><td><a class="link mono" href="{{ url_for('cases.case_detail', case_id=c.id) }}">{{ c.case_code }}</a></td>
+          <td>{{ c.title or '—' }}</td><td><span class="chip">{{ c.status }}</span></td>
+          <td class="num">{{ counts.get(c.id, 0) }}</td><td>{{ c.created_at.strftime('%Y-%m-%d') }}</td></tr>{% endfor %}
+    </tbody></table></div>
+  {% include "_pager.html" %}
+  {% else %}
+  <div class="empty-state small">{{ icon('users', 'icon-xl') }}<b>{{ 'No matching cases' if (q or status) else 'No cases yet' }}</b><span class="hint">{{ 'Try a different search.' if (q or status) else 'Create your first case above.' }}</span></div>
+  {% endif %}
+</section>
+{% endblock %}

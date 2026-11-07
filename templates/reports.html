@@ -1,24 +1,9 @@
-<!doctype html>
-<html lang="en" data-theme="dark">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark light" />
-    <title>Reports – NeuroInsight (Research Prototype)</title>
-    {% include "_theme_init.html" %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
-  </head>
-  <body>
-    <a class="skip" href="#main">Skip to main content</a>
+{% extends "base_app.html" %}
+{% block title %}Reports – NeuroInsight{% endblock %}
+{% set active = "reports_page" %}
+{% block page_title %}Reports{% endblock %}
+{% block content %}
 
-    <div class="disclaimer" role="note">
-      <strong>Research prototype.</strong> {{ disclaimer }}
-    </div>
-
-    {% set active = "reports" %}
-    {% include "_site_header.html" %}
-
-    <main id="main" class="wrap">
       <!-- Header: title, search, filter, export -->
       <section class="page-head">
         <div>
@@ -48,6 +33,14 @@
           <select id="fClass">
             <option value="">All classes</option>
             {% for value, label in classes %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="fCase">Case</label>
+          <select id="fCase">
+            <option value="">All cases</option>
+            <option value="none">No case</option>
+            {% for c in cases %}<option value="{{ c.id }}">{{ c.case_code }}</option>{% endfor %}
           </select>
         </div>
         <div class="field">
@@ -92,7 +85,7 @@
           <div><b>No reports yet</b></div>
           <div class="hint">Analyse an MRI image, then press <b>Save to Reports</b> on the result card. Reports keep only the
             prediction details, never the image.</div>
-          <a class="btn btn-primary" href="{{ url_for('index') }}">Go to MRI analysis</a>
+          <a class="btn btn-primary" href="{{ url_for('analysis_page') }}">Go to MRI analysis</a>
         </div>
         <div id="emptyFiltered" class="empty-state" hidden>
           <svg class="icon icon-xl" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -105,7 +98,7 @@
             <thead>
               <tr>
                 <th scope="col">Report ID</th>
-                <th scope="col">Case ID</th>
+                <th scope="col">Case</th>
                 <th scope="col">MRI image</th>
                 <th scope="col">Predicted class</th>
                 <th scope="col" class="num">Confidence</th>
@@ -128,7 +121,8 @@
           </div>
         </nav>
       </section>
-    </main>
+    
+
 
     <!-- Report preview -->
     <dialog id="previewDialog" class="dialog dialog-wide" aria-labelledby="pvTitle">
@@ -159,9 +153,10 @@
       </div>
     </dialog>
 
-    {% include "_site_footer.html" %}
+    
 
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/reports.js') }}"></script>
-  </body>
-</html>
+    
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon, csrf %}
+{% block title %}{{ u.full_name }} – NeuroInsight{% endblock %}
+{% block page_title %}Account{% endblock %}
+{% block content %}
+<p><a class="link" href="{{ url_for('admin.users') }}">← All accounts</a></p>
+<section class="card" aria-labelledby="ud-h">
+  <div class="profile-head"><span class="avatar avatar-lg" aria-hidden="true">{{ (u.full_name or '?')[:1] | upper }}</span>
+    <div><h1 class="h2" id="ud-h">{{ u.full_name }}</h1><p class="hint">{{ u.email }}</p></div></div>
+  <dl class="kv">
+    <dt>Status</dt><dd>{% if not u.is_active %}<span class="chip">Deactivated</span>{% else %}<span class="chip ok">Active</span>{% endif %}</dd>
+    <dt>Email</dt><dd>{{ 'Confirmed' if u.is_verified else 'Not confirmed' }}</dd>
+    <dt>Role</dt><dd>{{ u.role | capitalize }}</dd>
+    <dt>Institution</dt><dd>{{ u.institution or '—' }}</dd>
+    <dt>Occupation</dt><dd>{{ u.occupation or '—' }}</dd>
+    <dt>Joined</dt><dd>{{ u.created_at.strftime('%Y-%m-%d %H:%M') }} UTC</dd>
+    <dt>Last sign-in</dt><dd>{{ u.last_login_at.strftime('%Y-%m-%d %H:%M') + ' UTC' if u.last_login_at else '—' }}</dd>
+  </dl>
+  <p class="hint">Administrators cannot see this user's cases, analyses or reports.</p>
+  <div class="actions">
+    {% if u.is_active and not is_self %}
+    <form method="post" action="{{ url_for('admin.user_action', user_id=u.id, action='deactivate') }}">{{ csrf() }}
+      <details class="danger-zone"><summary>Deactivate this account…</summary>
+        <p class="hint">The user is signed out everywhere and cannot sign in until you reactivate the account. Their data is kept.</p>
+        <button type="submit" class="btn btn-danger btn-sm">Yes, deactivate {{ u.email }}</button></details></form>
+    {% elif not u.is_active %}
+    <form method="post" action="{{ url_for('admin.user_action', user_id=u.id, action='reactivate') }}">{{ csrf() }}
+      <button type="submit" class="btn btn-primary btn-sm">Reactivate account</button></form>
+    {% endif %}
+    <form method="post" action="{{ url_for('admin.user_action', user_id=u.id, action='revoke_sessions') }}">{{ csrf() }}
+      <button type="submit" class="btn btn-secondary btn-sm">End all sessions</button></form>
+  </div>
+</section>
+<section class="card table-card" aria-labelledby="uh-h">
+  <div class="card-head pad"><h2 id="uh-h">Administrative history</h2></div>
+  {% if history %}{% set items = history %}{% include "_audit_table.html" %}
+  {% else %}<div class="empty-state small">{{ icon('scroll-text', 'icon-xl') }}<b>No administrative actions on this account</b></div>{% endif %}
+</section>
+{% endblock %}

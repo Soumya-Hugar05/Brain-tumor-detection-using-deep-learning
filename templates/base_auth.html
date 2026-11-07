@@ -1,0 +1,24 @@
+{% extends "base_public.html" %}
+{% from "_components.html" import icon %}
+{% block content %}
+<section class="section auth-section">
+  <div class="wrap">
+    <div class="auth-card card">
+      <div class="auth-head">
+        <span class="feature-icon">{% block auth_icon %}{{ icon('lock') }}{% endblock %}</span>
+        <h1 class="h2">{% block auth_title %}{% endblock %}</h1>
+        <p class="hint">{% block auth_sub %}{% endblock %}</p>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="alert {{ 'alert-error' if category == 'error' else 'flash-' ~ category }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+      {% if error %}<div class="alert alert-error" role="alert">{{ error }}</div>{% endif %}
+      {% block auth_body %}{% endblock %}
+    </div>
+    {% block auth_after %}{% endblock %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/auth.js') }}"></script>{% endblock %}

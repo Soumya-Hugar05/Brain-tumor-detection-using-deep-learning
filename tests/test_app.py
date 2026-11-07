@@ -17,9 +17,10 @@ sys.path.insert(0, str(ROOT))
 import numpy as np
 from PIL import Image
 
+import helpers  # noqa: F401  (must come before `import app`)
 import app as appmod
 
-CLIENT = appmod.app.test_client()
+CLIENT = helpers.logged_in_client("tester@example.com")
 
 
 def _post(data: bytes, name: str = "x.jpg"):
@@ -136,7 +137,7 @@ def test_response_contract_and_gradcam_disabled():
 
 # ---- pages and metadata -------------------------------------------------------------------------------
 def test_index_shows_disclaimer_and_no_gradcam_ui():
-    html = CLIENT.get("/").get_data(as_text=True)
+    html = CLIENT.get("/app/analysis").get_data(as_text=True)
     assert "Research prototype" in html and "not a medical device" in html
     assert "Grad-CAM overlay" not in html and "<canvas" not in html
     assert CLIENT.get("/static/js/app.js").status_code == 200 and CLIENT.get("/static/css/app.css").status_code == 200

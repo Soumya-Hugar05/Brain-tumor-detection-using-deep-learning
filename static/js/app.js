@@ -184,6 +184,8 @@
     resetError();
     showResultPanel("loading"); el.btn.disabled = true; el.btnLabel.textContent = "Analysing…";
     const fd = new FormData();
+    const caseSel = document.getElementById("caseSelect");
+    if (caseSel && caseSel.value) fd.append("case_id", caseSel.value);
     fd.append("file", state.file, state.file.name);        // the original file, untouched by any viewer zoom or pan
     try {
       const resp = await fetch("/api/predict", { method: "POST", body: fd, signal: controller.signal });
@@ -284,7 +286,7 @@
   }
   function markSaved(id) {
     el.saveReport.disabled = true; el.saveLabel.textContent = "Saved ✓";
-    el.viewSaved.href = "/reports?view=" + encodeURIComponent(id); el.viewSaved.hidden = false;
+    el.viewSaved.href = "/app/reports?view=" + encodeURIComponent(id); el.viewSaved.hidden = false;
   }
   async function saveReport() {
     const result = state.result;

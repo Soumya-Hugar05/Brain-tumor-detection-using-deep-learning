@@ -29,13 +29,21 @@ import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
-import sqlite3
+import sqlalchemy as sa
 
-from flask import Flask, jsonify, render_template, request, send_file
+from flask import jsonify, redirect, render_template, request, send_file, url_for
+from flask_login import current_user
 from PIL import Image, UnidentifiedImageError
 
 import reports as rpt
 from inference import MODEL_BUNDLE_DIR, Predictor
+from webapp import create_app
+from webapp.access import protected
+from webapp.config import DISCLAIMER_TEXT
+from webapp.extensions import db
+from webapp.report_store import DbReportStore
+from webapp.models import Case, Prediction
+from webapp.notify import notify
 
 ROOT = Path(__file__).resolve().parent
 
@@ -52,8 +60,7 @@ MAX_PIXELS = 25_000_000                           # guards against decompression
 CONFIDENCE_NO_WARNING = 0.90
 CONFIDENCE_LOW = 0.70
 
-DISCLAIMER = ("NeuroInsight is a research prototype. It is not a medical device or diagnostic tool and must not "
-              "be used to diagnose, treat or make decisions about any patient.")
+DISCLAIMER = DISCLAIMER_TEXT
 
 GRADCAM_STATUS = dict(
     available=False,
@@ -62,14 +69,13 @@ GRADCAM_STATUS = dict(
 
 MODEL_NAME = "NeuroInsight Phase B SVM (ResNet50 features)"
 
-app = Flask(__name__)
+app = create_app()   # configuration, database, sign-in, CSRF and security headers: see webapp/
 app.config["MAX_CONTENT_LENGTH"] = MAX_UPLOAD_BYTES + 64 * 1024   # headroom for multipart framing
-app.config["REPORTS_DB"] = None   # default: $NEUROINSIGHT_REPORTS_DB, else instance/reports.sqlite3 (tests override this)
+app.config["REPORTS_DB"] = None   # only the one-off legacy import (flask import-legacy-reports) reads the old SQLite file
 
 _PREDICTOR: Predictor | None = None
 _LOAD_ERROR: str | None = None
 _LOCK = threading.Lock()
-_STORE_LOCK = threading.Lock()
 PREDICTIONS = rpt.PredictionCache()   # recent server-produced results (no images); only these can become reports
 
 
@@ -139,17 +145,36 @@ def _too_large(_e):
 
 
 @app.get("/")
-def index():
+def landing():
+    """Public landing page. The numbers shown come from the verified Phase B results file (never hard-coded)."""
+    return render_template("landing.html", disclaimer=DISCLAIMER, info=model_info_payload(),
+                           class_label=rpt.CLASS_LABEL)
+
+
+@app.get("/app/analysis")
+@protected()
+def analysis_page():
+    open_cases = Case.query.filter_by(user_id=current_user.id, status="open").order_by(Case.case_code).all()
+    chosen = request.args.get("case", "")
     return render_template("index.html", disclaimer=DISCLAIMER, max_mb=MAX_UPLOAD_BYTES // (1024 * 1024),
-                           accept=",".join("." + e for e in sorted(ALLOWED_EXTENSIONS)))
+                           accept=",".join("." + e for e in sorted(ALLOWED_EXTENSIONS)), open_cases=open_cases,
+                           chosen_case=chosen if chosen.isdigit() else "")
 
 
 @app.post("/api/predict")
+@protected()
 def api_predict():
     try:
         data = validate_upload(request.files.get("file"))
     except UploadError as exc:
         return _json_error(exc.message, exc.status)
+    case_id = None
+    raw_case = (request.form.get("case_id") or "").strip()
+    if raw_case:                                           # optional: the analysis is filed under one of the user's own open cases
+        owned = Case.query.filter_by(id=int(raw_case), user_id=current_user.id, status="open").first() if raw_case.isdigit() else None
+        if owned is None:
+            return _json_error("That case was not found or is archived.", 400)
+        case_id = owned.id
     try:
         predictor = get_predictor()
     except RuntimeError as exc:
@@ -165,7 +190,18 @@ def api_predict():
     prediction_id = PREDICTIONS.add(dict(
         file_name=rpt.safe_display_filename(request.files["file"].filename), predicted_class=result.label,
         confidence=result.confidence, probabilities=result.probabilities, warning=warning,
-        model=_model_details(predictor)))
+        model=_model_details(predictor)), current_user.id)
+    try:                                   # analysis history: metadata only, never the image; a failure must not lose the result
+        db.session.add(Prediction(public_id=prediction_id, user_id=current_user.id, case_id=case_id, file_name=rpt.safe_display_filename(request.files["file"].filename),
+                                  predicted_class=result.label, confidence=float(result.confidence),
+                                  probabilities={k: float(v) for k, v in result.probabilities.items()}, warning_level=warning["level"],
+                                  model_estimator_sha256=info["estimator_sha256"]))
+        notify(current_user, "analysis", "Analysis completed",
+               f"{rpt.CLASS_LABEL[result.label]} · {result.confidence * 100:.2f}%", url_for("cases.history"))
+        db.session.commit()
+    except Exception:  # noqa: BLE001
+        db.session.rollback()
+        app.logger.warning("could not record the analysis in the history")
     return jsonify(
         ok=True,
         prediction_id=prediction_id,
@@ -199,8 +235,8 @@ def _phase_b_results() -> dict:
     return json.loads((MODEL_BUNDLE_DIR.parent.parent / "results" / "phase_b.json").read_text(encoding="utf-8"))
 
 
-@app.get("/api/model-info")
-def api_model_info():
+def model_info_payload() -> dict | None:
+    """Verified Phase B facts for the About panel and the public landing page; None if the results file is unavailable."""
     try:
         sel = _phase_b_results()["selected_model"]
         val, bun = sel["val"], sel["bundle"]
@@ -210,9 +246,8 @@ def api_model_info():
                        tumor_vs_notumor=val["tumor_vs_notumor"], per_class=per_class,
                        ece=val["calibration"]["ece"], confusion_matrix=val["confusion_matrix"])
     except Exception:
-        return _json_error("The verified model metrics are not available.", 503)
-    return jsonify(
-        ok=True,
+        return None
+    return dict(
         architecture=dict(
             summary=("Frozen ImageNet ResNet50 (global-average-pooled conv5 features, 2048-d) feeding an RBF "
                      "support-vector machine with Platt-scaled probabilities."),
@@ -246,6 +281,17 @@ def api_model_info():
     )
 
 
+app.config["MODEL_INFO_FACTORY"] = model_info_payload
+
+
+@app.get("/api/model-info")
+def api_model_info():
+    payload = model_info_payload()
+    if payload is None:
+        return _json_error("The verified model metrics are not available.", 503)
+    return jsonify(ok=True, **payload)
+
+
 @app.get("/api/samples")
 def api_samples():
     path = ROOT / "static" / "samples" / "samples.json"
@@ -261,27 +307,22 @@ def api_samples():
 # ===================================================================================================================
 # Reports module
 # ===================================================================================================================
-def report_store() -> rpt.ReportStore:
-    """The SQLite report store (created lazily). Location: app.config['REPORTS_DB'], else $NEUROINSIGHT_REPORTS_DB,
-    else instance/reports.sqlite3 (ignored by Git). The path is never sent to clients."""
-    raw = app.config.get("REPORTS_DB") or os.environ.get("NEUROINSIGHT_REPORTS_DB", "").strip() or ROOT / "instance" / "reports.sqlite3"
-    path = Path(raw).expanduser()
-    path = path if path.is_absolute() else ROOT / path
-    with _STORE_LOCK:
-        store = app.extensions.get("report_store")
-        if store is None or store.path != path:
-            store = app.extensions["report_store"] = rpt.ReportStore(path)
-        return store
+def report_store() -> DbReportStore:
+    """Reports live in the main application database (table `reports`), always scoped to the signed-in user."""
+    return DbReportStore(app)
+
+
+app.config["REPORT_STORE_FACTORY"] = report_store
 
 
 def _summary(rec: dict) -> dict:
-    return dict(report_id=rec["report_id"], case_id=None, file_name=rec["file_name"], predicted_class=rec["predicted_class"],
+    return dict(report_id=rec["report_id"], case_id=rec.get("case_id"), case_code=rec.get("case_code"), file_name=rec["file_name"], predicted_class=rec["predicted_class"],
                 confidence=rec["confidence"], warning_level=rec["warning"]["level"], created_at=rec["created_at"])
 
 
 def _detail(rec: dict) -> dict:
     return dict(rpt.report_json(rec, DISCLAIMER, GRADCAM_STATUS["reason"]),
-                warning=rec["warning"], created_at=rec["created_at"], case_id=None)
+                warning=rec["warning"], created_at=rec["created_at"], case_id=rec.get("case_id"), case_code=rec.get("case_code"))
 
 
 @app.after_request
@@ -301,7 +342,10 @@ def _api_errors(e):
         status = getattr(e, "code", 500) or 500
         msg = {404: "Not found.", 405: "Method not allowed."}.get(status, "Something went wrong on the server.")
         return _json_error(msg, status)
-    return e
+    status = getattr(e, "code", 500) or 500
+    title = {404: "Page not found", 405: "Method not allowed"}.get(status, "Something went wrong")
+    msg = {404: "That page does not exist.", 405: "That action is not allowed here."}.get(status, "An unexpected error occurred.")
+    return render_template("error.html", disclaimer=DISCLAIMER, status=status, title=title, message=msg), status
 
 
 def _storage_error():
@@ -316,12 +360,20 @@ def _require_report_id(report_id: str):
 
 
 @app.get("/reports")
+def reports_legacy_redirect():
+    return redirect(url_for("reports_page"), code=301)
+
+
+@app.get("/app/reports")
+@protected()
 def reports_page():
-    return render_template("reports.html", disclaimer=DISCLAIMER, page_sizes=rpt.PAGE_SIZES,
+    cases = Case.query.filter_by(user_id=current_user.id).order_by(Case.case_code).all()
+    return render_template("reports.html", disclaimer=DISCLAIMER, page_sizes=rpt.PAGE_SIZES, cases=cases,
                            classes=[(c, rpt.CLASS_LABEL[c]) for c in rpt.CLASSES])
 
 
 @app.post("/api/reports")
+@protected()
 def api_reports_create():
     if not request.is_json:   # a cross-site HTML form cannot send JSON, which blocks simple CSRF posts
         return _json_error("Send the request as application/json.", 415)
@@ -331,79 +383,90 @@ def api_reports_create():
         return _json_error("A valid prediction_id is required.", 400)
     try:
         store = report_store()
-        pred = PREDICTIONS.get(pid)
+        pred = PREDICTIONS.get(pid, current_user.id)
         if pred is None:
-            existing = store.find_by_prediction_id(pid)       # already saved earlier (e.g. the cache entry has expired)
+            existing = store.find_by_prediction_id(pid, current_user.id)   # already saved earlier (e.g. the cache entry has expired)
             if existing:
                 return jsonify(ok=True, created=False, report=_summary(existing)), 200
             return _json_error("This analysis is no longer available. Run it again, then save the report.", 404)
-        rec, created = store.create(dict(pred, prediction_id=pid))
-    except (sqlite3.Error, OSError, RuntimeError):
+        rec, created = store.create(dict(pred, prediction_id=pid), current_user.id)
+        if created:
+            try:
+                notify(current_user, "report", "Report saved", rec["report_id"], url_for("reports_page") + "?view=" + rec["report_id"])
+                db.session.commit()
+            except sa.exc.SQLAlchemyError:
+                db.session.rollback()
+    except (sa.exc.SQLAlchemyError, OSError, RuntimeError):
         return _storage_error()
     return jsonify(ok=True, created=created, report=_summary(rec)), (201 if created else 200)
 
 
 @app.get("/api/reports")
+@protected()
 def api_reports_list():
     try:
         params = rpt.parse_list_params(request.args)
         store = report_store()
-        result = store.list(params)
-        stats = store.stats(params["tz_offset"])
+        result = store.list(params, current_user.id)
+        stats = store.stats(params["tz_offset"], current_user.id)
     except rpt.ValidationError as exc:
         return _json_error(str(exc), 400)
-    except (sqlite3.Error, OSError):
+    except (sa.exc.SQLAlchemyError, OSError):
         return _storage_error()
     result["items"] = [_summary(r) for r in result["items"]]
     return jsonify(ok=True, stats=stats, **result)
 
 
 @app.get("/api/reports/export")
+@protected()
 def api_reports_export():
     try:
         params = rpt.parse_list_params(request.args)
-        records = report_store().export_rows(params)
+        records = report_store().export_rows(params, current_user.id)
     except rpt.ValidationError as exc:
         return _json_error(str(exc), 400)
-    except (sqlite3.Error, OSError):
+    except (sa.exc.SQLAlchemyError, OSError):
         return _storage_error()
     return send_file(io.BytesIO(rpt.reports_csv(records).encode("utf-8")), mimetype="text/csv", as_attachment=True,
                      download_name="neuroinsight-reports.csv")
 
 
 @app.get("/api/reports/<report_id>")
+@protected()
 def api_reports_get(report_id):
     try:
-        rec = report_store().get(_require_report_id(report_id))
+        rec = report_store().get(_require_report_id(report_id), current_user.id)
     except rpt.ValidationError as exc:
         return _json_error(str(exc), 400)
-    except (sqlite3.Error, OSError):
+    except (sa.exc.SQLAlchemyError, OSError):
         return _storage_error()
     return jsonify(ok=True, report=_detail(rec)) if rec else _json_error("Report not found.", 404)
 
 
 @app.delete("/api/reports/<report_id>")
+@protected()
 def api_reports_delete(report_id):
     try:
-        deleted = report_store().delete(_require_report_id(report_id))
+        deleted = report_store().delete(_require_report_id(report_id), current_user.id)
     except rpt.ValidationError as exc:
         return _json_error(str(exc), 400)
-    except (sqlite3.Error, OSError):
+    except (sa.exc.SQLAlchemyError, OSError):
         return _storage_error()
     return jsonify(ok=True) if deleted else _json_error("Report not found.", 404)
 
 
 @app.get("/api/reports/<report_id>/download/<fmt>")
+@protected()
 def api_reports_download(report_id, fmt):
     """The file name is fixed by the server (never taken from the request or from the stored image name)."""
     if fmt not in rpt.DOWNLOAD_FORMATS:
         return _json_error("Unsupported download format. Use pdf, json or png.", 400)
     try:
         rid = _require_report_id(report_id)
-        rec = report_store().get(rid)
+        rec = report_store().get(rid, current_user.id)
     except rpt.ValidationError as exc:
         return _json_error(str(exc), 400)
-    except (sqlite3.Error, OSError):
+    except (sa.exc.SQLAlchemyError, OSError):
         return _storage_error()
     if rec is None:
         return _json_error("Report not found.", 404)

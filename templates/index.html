@@ -1,24 +1,10 @@
-<!doctype html>
-<html lang="en" data-theme="dark">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark light" />
-    <title>NeuroInsight – Brain MRI Analysis Platform (Research Prototype)</title>
-    {% include "_theme_init.html" %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
-  </head>
-  <body>
-    <a class="skip" href="#main">Skip to main content</a>
+{% extends "base_app.html" %}
+{% block title %}MRI Analysis – NeuroInsight{% endblock %}
+{% set active = "analysis_page" %}
+{% block page_title %}MRI Analysis{% endblock %}
+{% block content %}
+<h1 class="sr-only">MRI Analysis</h1>
 
-    <div class="disclaimer" role="note">
-      <strong>Research prototype.</strong> {{ disclaimer }}
-    </div>
-
-    {% set active = "analysis" %}
-    {% include "_site_header.html" %}
-
-    <main id="main" class="wrap">
       <div class="layout">
         <div class="col col-left">
           <!-- A. Upload + image viewer -->
@@ -71,6 +57,14 @@
               <span id="fileSize" class="chip"></span>
             </div>
 
+            {% if open_cases %}
+            <div class="field-block case-pick">
+              <label for="caseSelect">Add to case <span class="opt">(optional)</span></label>
+              <select id="caseSelect"><option value="">No case</option>
+                {% for c in open_cases %}<option value="{{ c.id }}"{% if chosen_case == c.id | string %} selected{% endif %}>{{ c.case_code }}{% if c.title %} – {{ c.title }}{% endif %}</option>{% endfor %}
+              </select>
+            </div>
+            {% endif %}
             <div class="actions">
               <button id="btn" type="button" class="btn btn-primary" disabled>
                 <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -180,13 +174,8 @@
         </div>
         <div id="aboutBody" class="about-body hint">Loading…</div>
       </section>
-    </main>
-
-    <!-- H. Footer -->
-    {% include "_site_footer.html" %}
-
-    <script>window.NEUROINSIGHT = { maxBytes: {{ max_mb * 1024 * 1024 }}, allowedExt: {{ accept.replace('.', '').split(',') | tojson }} };</script>
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+{% endblock %}
+{% block scripts %}
+<script nonce="{{ csp_nonce }}">window.NEUROINSIGHT = { maxBytes: {{ max_mb * 1024 * 1024 }}, allowedExt: {{ accept.replace('.', '').split(',') | tojson }} };</script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-  </body>
-</html>
+{% endblock %}

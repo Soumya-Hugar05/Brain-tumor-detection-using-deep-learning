@@ -2,6 +2,15 @@
    Sections: 1 tokens · 2 base · 3 header/footer · 4 cards & layout · 5 upload & viewer · 6 samples ·
              7 results · 8 about · 9 responsive · 10 motion */
 
+/* Inter (self-hosted, SIL OFL; see static/fonts/LICENSE-inter-OFL.txt) */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/inter-latin-wght-normal.woff2") format("woff2");
+}
+
 /* ---------- 1. Design tokens ---------- */
 :root {
   color-scheme: dark;

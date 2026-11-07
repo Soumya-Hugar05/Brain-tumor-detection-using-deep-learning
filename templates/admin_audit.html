@@ -1,0 +1,12 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon %}
+{% block title %}Audit log – NeuroInsight{% endblock %}
+{% block page_title %}Audit log{% endblock %}
+{% block content %}
+<h1 class="sr-only">Audit log</h1>
+<section class="card table-card" aria-labelledby="al-h">
+  <div class="card-head pad"><h2 id="al-h">Administrative actions <span class="hint">({{ total }})</span></h2></div>
+  {% if items %}{% include "_audit_table.html" %}{% include "_pager.html" %}
+  {% else %}<div class="empty-state small">{{ icon('scroll-text', 'icon-xl') }}<b>No actions yet</b></div>{% endif %}
+</section>
+{% endblock %}

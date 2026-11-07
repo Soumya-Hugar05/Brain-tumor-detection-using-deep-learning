@@ -1,0 +1,64 @@
+{% from "_components.html" import icon, logo %}
+<!doctype html>
+<html lang="en" data-theme="{{ current_user.theme or 'dark' }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <title>{% block title %}NeuroInsight{% endblock %}</title>
+    {% include "_theme_init.html" %}
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}" />
+    <link rel="preload" href="{{ url_for('static', filename='fonts/inter-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shell.css') }}" />
+  </head>
+  <body class="app-shell">
+    <a class="skip" href="#main">Skip to main content</a>
+    {% include "_sidebar.html" %}
+    <div id="sidebarBackdrop" class="sidebar-backdrop" hidden></div>
+    <div class="shell-body">
+      <div class="shell-top">
+      <div class="disclaimer" role="note"><strong>Research prototype.</strong> {{ disclaimer }}</div>
+      <header class="topbar">
+        <button id="sidebarToggle" type="button" class="icon-btn topbar-menu" aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation">{{ icon('menu') }}</button>
+        <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+        <div class="topbar-actions">
+          <button id="themeToggle" type="button" class="icon-btn" aria-label="Switch to light theme" title="Switch theme">
+            <svg class="icon icon-sun" aria-hidden="true" focusable="false"><use href="{{ url_for('static', filename='icons/sprite.svg') }}#i-sun"></use></svg>
+            <svg class="icon icon-moon" aria-hidden="true" focusable="false"><use href="{{ url_for('static', filename='icons/sprite.svg') }}#i-moon"></use></svg>
+          </button>
+          <a class="icon-btn bell" href="{{ url_for('account.notifications') }}" aria-label="Notifications{% if unread_notifications %} ({{ unread_notifications }} unread){% endif %}" title="Notifications">{{ icon('bell') }}{% if unread_notifications %}<span class="bell-count" aria-hidden="true">{{ unread_notifications if unread_notifications < 100 else '99+' }}</span>{% endif %}</a>
+          <div class="profile-menu">
+            <button id="profileBtn" type="button" class="profile-btn" aria-haspopup="true" aria-expanded="false" aria-controls="profileMenu">
+              <span class="avatar" aria-hidden="true">{{ (current_user.full_name or '?')[:1] | upper }}</span>
+              <span class="profile-name">{{ current_user.full_name }}</span>
+              {{ icon('chevron-down') }}
+            </button>
+            <div id="profileMenu" class="menu" role="menu" hidden>
+              <div class="menu-head"><b>{{ current_user.full_name }}</b><span class="hint">{{ current_user.email }}</span></div>
+              <a role="menuitem" href="{{ url_for('account.profile') }}">{{ icon('user') }} My Profile</a>
+              <a role="menuitem" href="{{ url_for('account.settings') }}">{{ icon('settings') }} Settings</a>
+              <form method="post" action="{{ url_for('auth.logout') }}" role="none">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" role="menuitem">{{ icon('log-out') }} Sign out</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </header>
+      </div>
+      <main id="main" class="shell-main">
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="alert {{ 'alert-error' if category == 'error' else 'alert-ok' }}" role="status">{{ message }}</div>
+        {% endfor %}
+        {% block content %}{% endblock %}
+      </main>
+      <footer class="shell-foot"><p class="hint">NeuroInsight is a research prototype and not a medical device. Not intended for medical diagnosis.</p></footer>
+    </div>
+    <div id="toasts" class="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shell.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,87 @@
+{% extends "base_app.html" %}
+{% from "_components.html" import icon %}
+{% block title %}Dashboard – NeuroInsight{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% macro when(ts) -%}<time class="js-time" datetime="{{ ts }}">{{ ts.replace('T', ' ').replace('Z', ' UTC') }}</time>{%- endmacro %}
+{% block content %}
+<section class="welcome card">
+  <div>
+    <p class="eyebrow">Dashboard</p>
+    <h1 class="welcome-title">Welcome back, {{ first_name }}</h1>
+    <p class="hint" id="today">Today</p>
+  </div>
+  <div class="actions">
+    <a class="btn btn-primary" href="{{ url_for('analysis_page') }}">{{ icon('plus') }} New Analysis</a>
+    <a class="btn btn-secondary" href="{{ url_for('reports_page') }}">{{ icon('file-text') }} Reports</a>
+  </div>
+</section>
+
+<section class="stat-grid" aria-label="Your statistics">
+  <article class="stat-card"><span class="stat-icon">{{ icon('scan-line') }}</span><div><div class="stat-num" id="statAnalyses">{{ stats.analyses }}</div><div class="stat-lbl">Total analyses</div></div></article>
+  <article class="stat-card"><span class="stat-icon">{{ icon('users') }}</span><div><div class="stat-num" id="statCases">{{ stats.cases }}</div><div class="stat-lbl">Total cases</div></div></article>
+  <article class="stat-card"><span class="stat-icon">{{ icon('file-text') }}</span><div><div class="stat-num" id="statReports">{{ stats.reports }}</div><div class="stat-lbl">Reports generated</div></div></article>
+  <article class="stat-card"><span class="stat-icon">{{ icon('activity') }}</span><div><div class="stat-num" id="statActivity">{{ stats.activity_week }}</div><div class="stat-lbl">Recent activity</div><div class="stat-sub">last 7 days: {{ stats.analyses_week }} analyses, {{ stats.reports_week }} reports</div></div></article>
+</section>
+
+<div class="dash-grid">
+  <section class="card" aria-labelledby="ra-h">
+    <div class="card-head"><h2 id="ra-h">Recent analyses</h2><a class="link" href="{{ url_for('cases.history') }}">History</a></div>
+    {% if recent_analyses %}
+    <div class="table-scroll"><table class="mini-table" id="recentAnalyses">
+      <thead><tr><th>File</th><th>Result</th><th class="num">Confidence</th><th>When</th></tr></thead>
+      <tbody>{% for p in recent_analyses %}
+        <tr><td class="cell-file" title="{{ p.file_name }}">{{ p.file_name }}</td>
+            <td><span class="class-tag" data-class="{{ p.predicted_class }}">{{ class_label[p.predicted_class] }}</span></td>
+            <td class="num conf" data-level="{{ p.warning_level }}">{{ '%.2f' | format(p.confidence * 100) }}%</td>
+            <td>{{ when(p.created_at.strftime('%Y-%m-%dT%H:%M:%SZ')) }}</td></tr>{% endfor %}
+      </tbody></table></div>
+    {% else %}
+    <div class="empty-state small">{{ icon('scan-line', 'icon-xl') }}<b>No analyses yet</b><span class="hint">Run your first MRI analysis to see it here.</span><a class="btn btn-secondary btn-sm" href="{{ url_for('analysis_page') }}">Start an analysis</a></div>
+    {% endif %}
+  </section>
+
+  <section class="card" aria-labelledby="lr-h">
+    <div class="card-head"><h2 id="lr-h">Latest reports</h2><a class="link" href="{{ url_for('reports_page') }}">All reports</a></div>
+    {% if latest_reports %}
+    <ul class="item-list" id="latestReports">{% for r in latest_reports %}
+      <li><div><span class="mono">{{ r.report_id }}</span><span class="hint">{{ r.file_name }}</span></div>
+          <div class="right"><span class="class-tag" data-class="{{ r.predicted_class }}">{{ class_label[r.predicted_class] }}</span>{{ when(r.created_at) }}</div></li>{% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state small">{{ icon('file-text', 'icon-xl') }}<b>No reports yet</b><span class="hint">Save an analysis to Reports to create one.</span></div>
+    {% endif %}
+  </section>
+
+  <section class="card" aria-labelledby="rc-h">
+    <div class="card-head"><h2 id="rc-h">Recent cases</h2><a class="link" href="{{ url_for('cases.cases') }}">Cases</a></div>
+    {% if recent_cases %}
+    <ul class="item-list" id="recentCases">{% for c in recent_cases %}
+      <li><div><b>{{ c.case_code }}</b><span class="hint">{{ c.title or 'No title' }}</span></div><div class="right"><span class="chip">{{ c.status }}</span>{{ when(c.created_at.strftime('%Y-%m-%dT%H:%M:%SZ')) }}</div></li>{% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state small">{{ icon('users', 'icon-xl') }}<b>No cases yet</b><span class="hint">Create a case to group related analyses.</span></div>
+    {% endif %}
+  </section>
+
+  <section class="card" aria-labelledby="act-h">
+    <div class="card-head"><h2 id="act-h">Recent activity</h2></div>
+    {% if activity %}
+    <ol class="timeline" id="activityFeed">{% for a in activity %}
+      <li data-kind="{{ a.kind }}"><span class="dot" aria-hidden="true"></span><div><b>{{ a.title }}</b><span class="hint">{{ a.detail }}</span>{{ when(a.when) }}</div></li>{% endfor %}
+    </ol>
+    {% else %}
+    <div class="empty-state small">{{ icon('activity', 'icon-xl') }}<b>No activity yet</b><span class="hint">Analyses and reports you create will appear here.</span></div>
+    {% endif %}
+  </section>
+</div>
+
+<section class="card" aria-labelledby="qa-h">
+  <div class="card-head"><h2 id="qa-h">Quick actions</h2></div>
+  <div class="quick-grid">
+    <a class="quick" href="{{ url_for('analysis_page') }}">{{ icon('scan-line') }}<b>New analysis</b><span class="hint">Upload an MRI slice or try a demo sample</span></a>
+    <a class="quick" href="{{ url_for('reports_page') }}">{{ icon('file-text') }}<b>Reports</b><span class="hint">Search, preview and download</span></a>
+    <a class="quick" href="{{ url_for('dashboard.model') }}">{{ icon('chart-column') }}<b>Model performance</b><span class="hint">Validation metrics and limitations</span></a>
+    <a class="quick" href="{{ url_for('account.profile') }}">{{ icon('user') }}<b>My profile</b><span class="hint">Your account details</span></a>
+  </div>
+</section>
+{% endblock %}

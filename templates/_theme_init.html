@@ -1,8 +1,13 @@
-<script>
+<script nonce="{{ csp_nonce }}">
       /* Apply the saved theme before first paint to avoid a flash. Storage may be unavailable. */
       (function () {
         try {
+          {% if current_user.is_authenticated and current_user.theme %}
+          var t = {{ current_user.theme | tojson }};            /* the signed-in user's saved choice wins on every device */
+          localStorage.setItem("neuroinsight-theme", t);
+          {% else %}
           var t = localStorage.getItem("neuroinsight-theme");
+          {% endif %}
           if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
         } catch (e) { /* ignore */ }
       })();

@@ -1,0 +1,11 @@
+{% extends "base_auth.html" %}
+{% from "_components.html" import icon %}
+{% block title %}{{ title }} – NeuroInsight{% endblock %}
+{% block auth_icon %}{{ icon(icon_name or 'info') }}{% endblock %}
+{% block auth_title %}{{ title }}{% endblock %}
+{% block auth_sub %}{{ message }}{% endblock %}
+{% block auth_body %}
+<div class="actions center">
+  {% for label, href in actions %}<a class="btn {{ 'btn-primary' if loop.first else 'btn-ghost' }}" href="{{ href }}">{{ label }}</a>{% endfor %}
+</div>
+{% endblock %}

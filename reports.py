@@ -101,6 +101,9 @@ def parse_list_params(args) -> dict:
     cls = (args.get("cls") or "").strip()
     if cls and cls not in CLASSES:
         raise ValidationError("Unknown predicted class.")
+    case = (args.get("case") or "").strip()
+    if case and case != "none" and not (case.isascii() and case.isdigit() and len(case) <= 12):
+        raise ValidationError("Invalid case filter.")
     sort = (args.get("sort") or "newest").strip()
     if sort not in SORTS:
         raise ValidationError("Invalid sort order.")
@@ -118,7 +121,7 @@ def parse_list_params(args) -> dict:
     page_size = _int("page_size", PAGE_SIZES[0], 1, 1000)
     if page_size not in PAGE_SIZES:
         raise ValidationError("Invalid page size.")
-    return dict(q=q, cls=cls, sort=sort, tz_offset=tz, date_from=dates["date_from"], date_to=dates["date_to"],
+    return dict(q=q, cls=cls, case=case, sort=sort, tz_offset=tz, date_from=dates["date_from"], date_to=dates["date_to"],
                 page=_int("page", 1, 1, 1_000_000), page_size=page_size)
 
 
@@ -130,27 +133,28 @@ class PredictionCache:
 
     def __init__(self, max_items: int = 256, ttl_seconds: int = 3600):
         self.max_items, self.ttl = max_items, ttl_seconds
-        self._items: OrderedDict[str, tuple[float, dict]] = OrderedDict()
+        self._items: OrderedDict[str, tuple[float, int, dict]] = OrderedDict()
         self._lock = threading.Lock()
 
-    def add(self, data: dict) -> str:
+    def add(self, data: dict, user_id: int) -> str:
         pid = secrets.token_hex(16)
         now = time.monotonic()
         with self._lock:
             self._purge(now)
-            self._items[pid] = (now, data)
+            self._items[pid] = (now, user_id, data)
             while len(self._items) > self.max_items:
                 self._items.popitem(last=False)
         return pid
 
-    def get(self, pid: str) -> dict | None:
+    def get(self, pid: str, user_id: int) -> dict | None:
+        """Only the user who made the prediction can retrieve it (a different user gets None, as if it never existed)."""
         with self._lock:
             self._purge(time.monotonic())
             hit = self._items.get(pid)
-            return None if hit is None else json.loads(json.dumps(hit[1]))
+            return None if hit is None or hit[1] != user_id else json.loads(json.dumps(hit[2]))
 
     def _purge(self, now: float) -> None:
-        for k in [k for k, (t, _) in self._items.items() if now - t > self.ttl]:
+        for k in [k for k, (t, *_rest) in self._items.items() if now - t > self.ttl]:
             del self._items[k]
 
 
@@ -168,7 +172,8 @@ CREATE TABLE IF NOT EXISTS reports (
     warning_level   TEXT NOT NULL,
     warning_message TEXT,
     created_at      TEXT NOT NULL,
-    model_json      TEXT NOT NULL
+    model_json      TEXT NOT NULL,
+    user_id         INTEGER
 );
 CREATE INDEX IF NOT EXISTS idx_reports_created ON reports (created_at);
 CREATE INDEX IF NOT EXISTS idx_reports_class ON reports (predicted_class);
@@ -186,6 +191,10 @@ class ReportStore:
         self._lock = threading.Lock()
         with self._connect() as con:
             con.executescript(_SCHEMA)
+            if "user_id" not in {r["name"] for r in con.execute("PRAGMA table_info(reports)")}:
+                # reports saved before accounts existed have no owner: they stay in the file but belong to nobody
+                con.execute("ALTER TABLE reports ADD COLUMN user_id INTEGER")
+            con.execute("CREATE INDEX IF NOT EXISTS idx_reports_user ON reports (user_id)")
 
     @contextmanager
     def _connect(self):
@@ -209,10 +218,10 @@ class ReportStore:
             warning=dict(level=row["warning_level"], message=row["warning_message"]),
             created_at=row["created_at"], model=json.loads(row["model_json"]))
 
-    def create(self, pred: dict) -> tuple[dict, bool]:
-        """Persist a server-produced prediction as a report. Idempotent: the same prediction_id returns the same report."""
+    def create(self, pred: dict, user_id: int) -> tuple[dict, bool]:
+        """Persist a server-produced prediction as the user's report. Idempotent per prediction_id."""
         with self._lock, self._connect() as con:
-            row = con.execute("SELECT * FROM reports WHERE prediction_id = ?", (pred["prediction_id"],)).fetchone()
+            row = con.execute("SELECT * FROM reports WHERE prediction_id = ? AND user_id = ?", (pred["prediction_id"], user_id)).fetchone()
             if row:
                 return self._record(row), False
             now = datetime.now(timezone.utc)
@@ -221,37 +230,37 @@ class ReportStore:
                 try:
                     con.execute(
                         "INSERT INTO reports (report_id, prediction_id, file_name, predicted_class, confidence, probabilities,"
-                        " warning_level, warning_message, created_at, model_json) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                        " warning_level, warning_message, created_at, model_json, user_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                         (rid, pred["prediction_id"], pred["file_name"], pred["predicted_class"], float(pred["confidence"]),
                          json.dumps({c: float(pred["probabilities"][c]) for c in CLASSES}), pred["warning"]["level"],
-                         pred["warning"]["message"], _fmt(now), json.dumps(pred["model"])))
+                         pred["warning"]["message"], _fmt(now), json.dumps(pred["model"]), user_id))
                     break
                 except sqlite3.IntegrityError:
-                    row = con.execute("SELECT * FROM reports WHERE prediction_id = ?", (pred["prediction_id"],)).fetchone()
+                    row = con.execute("SELECT * FROM reports WHERE prediction_id = ? AND user_id = ?", (pred["prediction_id"], user_id)).fetchone()
                     if row:  # lost a race with an identical request
                         return self._record(row), False
             else:
                 raise RuntimeError("could not allocate a report id")
             return self._record(con.execute("SELECT * FROM reports WHERE report_id = ?", (rid,)).fetchone()), True
 
-    def get(self, report_id: str) -> dict | None:
+    def get(self, report_id: str, user_id: int) -> dict | None:
         with self._connect() as con:
-            row = con.execute("SELECT * FROM reports WHERE report_id = ?", (report_id,)).fetchone()
+            row = con.execute("SELECT * FROM reports WHERE report_id = ? AND user_id = ?", (report_id, user_id)).fetchone()
         return self._record(row) if row else None
 
-    def find_by_prediction_id(self, prediction_id: str) -> dict | None:
+    def find_by_prediction_id(self, prediction_id: str, user_id: int) -> dict | None:
         with self._connect() as con:
-            row = con.execute("SELECT * FROM reports WHERE prediction_id = ?", (prediction_id,)).fetchone()
+            row = con.execute("SELECT * FROM reports WHERE prediction_id = ? AND user_id = ?", (prediction_id, user_id)).fetchone()
         return self._record(row) if row else None
 
-    def delete(self, report_id: str) -> bool:
+    def delete(self, report_id: str, user_id: int) -> bool:
         with self._lock, self._connect() as con:
-            return con.execute("DELETE FROM reports WHERE report_id = ?", (report_id,)).rowcount > 0
+            return con.execute("DELETE FROM reports WHERE report_id = ? AND user_id = ?", (report_id, user_id)).rowcount > 0
 
     # -- queries -------------------------------------------------------------------------------------------
     @staticmethod
-    def _where(p: dict) -> tuple[str, list]:
-        clauses, args = [], []
+    def _where(p: dict, user_id: int) -> tuple[str, list]:
+        clauses, args = ["user_id = ?"], [user_id]
         if p["q"]:
             clauses.append("(report_id LIKE ? ESCAPE '\\' OR file_name LIKE ? ESCAPE '\\')")
             args += [_like(p["q"]), _like(p["q"])]
@@ -266,8 +275,8 @@ class ReportStore:
             args.append(_fmt(_local_day_start_utc(p["date_to"], p["tz_offset"]) + timedelta(days=1)))
         return (" WHERE " + " AND ".join(clauses)) if clauses else "", args
 
-    def list(self, p: dict) -> dict:
-        where, args = self._where(p)
+    def list(self, p: dict, user_id: int) -> dict:
+        where, args = self._where(p, user_id)
         with self._connect() as con:
             total = con.execute("SELECT COUNT(*) FROM reports" + where, args).fetchone()[0]
             pages = max(1, math.ceil(total / p["page_size"]))
@@ -276,7 +285,7 @@ class ReportStore:
                                args + [p["page_size"], (page - 1) * p["page_size"]]).fetchall()
         return dict(items=[self._record(r) for r in rows], total=total, page=page, pages=pages, page_size=p["page_size"])
 
-    def stats(self, tz_offset: int = 0) -> dict:
+    def stats(self, tz_offset: int = 0, user_id: int = 0) -> dict:
         """Real counts: all reports, reports generated today and this month (local day / month of the client)."""
         local_now = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(minutes=tz_offset)
         day = local_now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -285,12 +294,17 @@ class ReportStore:
         with self._connect() as con:
             def count(since=None):
                 if since is None:
-                    return con.execute("SELECT COUNT(*) FROM reports").fetchone()[0]
-                return con.execute("SELECT COUNT(*) FROM reports WHERE created_at >= ?", (_fmt(since + offset),)).fetchone()[0]
+                    return con.execute("SELECT COUNT(*) FROM reports WHERE user_id = ?", (user_id,)).fetchone()[0]
+                return con.execute("SELECT COUNT(*) FROM reports WHERE user_id = ? AND created_at >= ?", (user_id, _fmt(since + offset))).fetchone()[0]
             return dict(total=count(), today=count(day), this_month=count(month))
 
-    def export_rows(self, p: dict) -> list[dict]:
-        where, args = self._where(p)
+    def count_since(self, user_id: int, since_ts: str) -> int:
+        """Number of the user's reports created at or after a UTC timestamp string (TS_FORMAT)."""
+        with self._connect() as con:
+            return con.execute("SELECT COUNT(*) FROM reports WHERE user_id = ? AND created_at >= ?", (user_id, since_ts)).fetchone()[0]
+
+    def export_rows(self, p: dict, user_id: int) -> list[dict]:
+        where, args = self._where(p, user_id)
         with self._connect() as con:
             rows = con.execute(f"SELECT * FROM reports{where} ORDER BY {SORTS[p['sort']]} LIMIT {EXPORT_LIMIT}", args).fetchall()
         return [self._record(r) for r in rows]

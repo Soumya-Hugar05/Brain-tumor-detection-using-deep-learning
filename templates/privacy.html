@@ -1,0 +1,20 @@
+{% extends "base_public.html" %}
+{% block title %}Privacy notice (draft) – NeuroInsight{% endblock %}
+{% block content %}
+<section class="section"><div class="wrap narrow prose">
+  <div class="alert flash-info" role="note"><b>Draft.</b> This notice describes the current behaviour of the software. It has not been legally reviewed and must be reviewed before any public use.</div>
+  <h1 class="h2">Privacy notice</h1>
+  <h2>What we store</h2>
+  <p><b>Account data:</b> name, email address, optional institution and self-declared occupation, a password hash (never the password), sign-in timestamps and when you accepted these documents.</p>
+  <p><b>Analysis records:</b> every analysis you run is recorded in your history (the image file name you uploaded, the predicted class, the confidence and class probabilities, the time and the model identifier), and the reports you save keep the same details. Image file names can reveal personal information, so use neutral names.</p>
+  <p><b>Security data:</b> recent sign-in attempts (email stored only as a hash, plus the network address) to limit password guessing; single-use verification and reset tokens (stored only as hashes).</p>
+  <h2>What we do not store</h2>
+  <p>MRI images are processed in memory and are <b>not</b> stored. We collect no patient names, birth dates or medical record numbers, and no analytics or advertising data.</p>
+  <h2>Who can see it</h2>
+  <p>Your analysis records are visible only to your own account. Administrators can manage accounts but are not given access to your analysis records.</p>
+  <h2>Cookies</h2>
+  <p>We use a session cookie to keep you signed in and, if you tick "Remember me", a longer sign-in cookie. We use no tracking cookies.</p>
+  <h2>Your choices</h2>
+  <p>You can delete your saved reports in the app. Ask an administrator to delete your account and the data linked to it.</p>
+</div></section>
+{% endblock %}
