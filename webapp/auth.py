@@ -86,15 +86,19 @@ def login():
     return redirect(next_url or url_for("dashboard.home"))
 
 
-@bp.route("/logout", methods=["GET", "POST"])
+@bp.post("/logout")
 def logout():
-    if request.method == "POST":
-        if current_user.is_authenticated:
-            log.info("logout user_id=%s", current_user.id)
-        logout_user()
-        session.clear()
-        flash("You have been signed out.", "success")
-    return redirect(url_for("auth.login") if request.method == "POST" else url_for("landing"))
+    """End the session (any role) and return to the public landing page. POST only, CSRF-protected; nothing is deleted."""
+    if current_user.is_authenticated:
+        log.info("logout user_id=%s", current_user.id)
+    session.clear()                                           # CSRF token and any other per-user session data
+    logout_user()                                             # must come AFTER clear(): it marks the remember-me cookie for deletion in
+                                                              # the session, and clearing afterwards would leave that cookie signing the user back in
+    flash("You have been signed out successfully.", "signedout")
+    resp = redirect(url_for("landing"))
+    resp.headers["Cache-Control"] = "no-store"
+    resp.headers["Clear-Site-Data"] = '"cache"'               # browsers drop cached pages, so Back cannot show the previous user's content
+    return resp
 
 
 # --------------------------------------------------------------------------------------------------------- sign up

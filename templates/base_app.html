@@ -39,7 +39,7 @@
               <div class="menu-head"><b>{{ current_user.full_name }}</b><span class="hint">{{ current_user.email }}</span></div>
               <a role="menuitem" href="{{ url_for('account.profile') }}">{{ icon('user') }} My Profile</a>
               <a role="menuitem" href="{{ url_for('account.settings') }}">{{ icon('settings') }} Settings</a>
-              <form method="post" action="{{ url_for('auth.logout') }}" role="none">
+              <form method="post" action="{{ url_for('auth.logout') }}" role="none" data-logout>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button type="submit" role="menuitem">{{ icon('log-out') }} Sign out</button>
               </form>

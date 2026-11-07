@@ -9,7 +9,7 @@ import logging
 import re
 import secrets
 
-from flask import Flask, g, jsonify, render_template, request
+from flask import Flask, flash, g, jsonify, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from flask_wtf.csrf import CSRFError
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -117,6 +117,12 @@ def create_app(config_overrides: dict | None = None) -> Flask:
 
     @app.errorhandler(CSRFError)
     def _csrf_error(_e):
+        if request.endpoint == "auth.logout" and not current_user.is_authenticated:
+            # The session had already expired (idle timeout, cleared cookie, restarted server): there is nothing left to protect,
+            # so finish the sign-out instead of showing an error. A signed-in session with a bad token is still refused.
+            session.clear()
+            flash("Your session had already ended. You are signed out.", "signedout")
+            return redirect(url_for("landing"))
         msg = "Your session expired or the request was not allowed. Reload the page and try again."
         if _wants_json():
             resp = jsonify(ok=False, error=msg)

@@ -1,6 +1,12 @@
 {% extends "base_public.html" %}
 {% from "_components.html" import icon %}
 {% block content %}
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+<div class="wrap flash-stack">{% for category, message in messages %}
+  <div class="alert {{ 'alert-error' if category == 'error' else 'flash-' ~ ('success' if category == 'signedout' else category) }}" role="{{ 'alert' if category == 'error' else 'status' }}">{{ message }}
+    {% if category == 'signedout' %}<span class="actions"><a class="btn btn-secondary btn-sm" href="{{ url_for('auth.login') }}">Login</a>
+      <a class="btn btn-primary btn-sm" href="{{ url_for('auth.signup') }}">Sign Up</a></span>{% endif %}</div>{% endfor %}
+</div>{% endif %}{% endwith %}
 
 <!-- Hero -->
 <section id="home" class="hero">

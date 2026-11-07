@@ -157,7 +157,7 @@ def test_login_logout_and_generic_errors():
     out = c.post("/logout")
     assert out.status_code == 302 and c.get("/app/analysis").status_code == 302
     c2 = helpers.logged_in_client("u@example.com")
-    assert c2.get("/logout").status_code == 302 and c2.get("/app/analysis").status_code == 200, "GET /logout must not sign anyone out"
+    assert c2.get("/logout").status_code == 405 and c2.get("/app/analysis").status_code == 200, "GET /logout must not sign anyone out"
     print("ok login/logout; wrong password and unknown email look identical; logout needs POST")
 
 
@@ -493,6 +493,123 @@ def test_auth_code_never_touches_models_or_the_test_split():
         src = (ROOT / name).read_text(encoding="utf-8")
         assert "load_split" not in src and "allow_test" not in src and "inference" not in src, name
     print("ok authentication code is independent of the model and the test split")
+
+
+# ---- logout (POST only, CSRF, lands on the public page, never leaves a usable session) --------------------------------------------
+def _text(html):
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", html, flags=re.S)))
+
+
+def APP_CLIENT_ANON():
+    return appmod.app.test_client()
+
+
+def test_logout_lands_on_the_public_page_for_every_role_and_ends_the_session():
+    fresh()
+    accounts = (("user@example.com", "user"), ("admin@example.com", "admin"), ("doctor@example.com", "user"))
+    for email, role in accounts:
+        c = helpers.logged_in_client(email, role=role)
+        assert c.get("/app").status_code == 200 and 'id="sidebar"' in c.get("/app").get_data(as_text=True)
+        out = c.post("/logout")
+        assert out.status_code == 302 and out.headers["Location"] == "/", (email, out.headers.get("Location"))
+        assert "no-store" in out.headers["Cache-Control"]
+        landing = c.get("/")
+        html = landing.get_data(as_text=True)
+        assert landing.status_code == 200 and "You have been signed out successfully." in html, email
+        assert 'href="/login">Login</a>' in html and 'href="/signup">Sign Up</a>' in html, "Login and Sign Up are offered after sign-out"
+        assert ">Sign Up<" not in APP_CLIENT_ANON().get("/").get_data(as_text=True), "the extra buttons appear only right after sign-out"
+        assert 'id="sidebar"' not in html and "Dashboard" not in _text(html).split("Intelligent Brain MRI Analysis")[0]
+        assert "You have been signed out successfully." not in c.get("/").get_data(as_text=True), "the message is shown once"
+        for path in ("/app", "/app/analysis", "/app/cases", "/app/settings", "/app/notifications"):
+            r = c.get(path)
+            assert r.status_code == 302 and "/login" in r.headers["Location"], (email, path)
+        for path in ("/api/reports", "/api/reports/export"):
+            assert c.get(path).status_code == 401, (email, path)
+        again = helpers.login(c, email)                                       # signing in again works
+        assert again.status_code == 302 and c.get("/app").status_code == 200, email
+    with appmod.app.app_context():
+        assert sorted(u.email for u in User.query.all()) == sorted(e for e, _ in accounts), "logout never deletes accounts"
+    print("ok logout works for user, admin and doctor: lands on /, message shown once, protected pages need sign-in, login again works")
+
+
+def test_logout_rejects_get_and_forged_requests_but_finishes_an_expired_session():
+    fresh()
+    c = helpers.logged_in_client("u@example.com")
+    assert c.get("/logout").status_code == 405 and c.get("/app").status_code == 200
+    assert c.post("/logout", csrf=False).status_code == 400 and c.get("/app").status_code == 200, "forged logout from a signed-in session is refused"
+    # An expired session (cookie gone) must not turn Logout into an error page.
+    from flask.testing import FlaskClient
+    plain = FlaskClient(appmod.app, appmod.app.response_class)
+    token = re.search(r'name="csrf-token" content="([^"]+)"', plain.get("/login").get_data(as_text=True)).group(1)
+    assert plain.post("/login", data=dict(email="u@example.com", password=PW, csrf_token=token)).status_code == 302
+    token = re.search(r'name="csrf-token" content="([^"]+)"', plain.get("/app").get_data(as_text=True)).group(1)
+    plain.delete_cookie(appmod.app.config["SESSION_COOKIE_NAME"])
+    r = plain.post("/logout", data={"csrf_token": token})
+    assert r.status_code == 302 and r.headers["Location"] == "/", r.status_code
+    assert "Your session had already ended" in plain.get("/").get_data(as_text=True)
+    print("ok logout needs POST and a CSRF token; an expired session is signed out cleanly instead of showing an error")
+
+
+def test_logout_clears_remember_me_and_protected_pages_are_not_cacheable():
+    fresh()
+    helpers.create_user("u@example.com")
+    c = appmod.app.test_client()
+    assert helpers.login(c, "u@example.com", remember="on").status_code == 302
+    assert c.get_cookie("neuroinsight_remember") is not None, "remember-me was really set"
+    protected_page = c.get("/app")
+    assert "no-store" in protected_page.headers["Cache-Control"], "signed-in pages must not be cached (Back button)"
+    out = c.post("/logout")
+    set_cookie = " ".join(out.headers.getlist("Set-Cookie"))
+    assert re.search(r"neuroinsight_remember=;[^,]*Expires=", set_cookie), "the remember-me cookie must be cleared"
+    assert c.get("/app").status_code == 302, "the remember-me cookie no longer restores the session"
+    assert c.get_cookie("neuroinsight_remember") is None, "the browser no longer holds the remember-me cookie"
+    assert c.get("/app").status_code == 302, "a refresh does not restore it either"
+    print("ok logout clears the remember-me cookie; refresh and Back cannot restore the session; signed-in pages are no-store")
+
+
+def test_logout_buttons_use_post_forms_with_csrf_and_the_double_submit_guard():
+    fresh()
+    c = helpers.logged_in_client("u@example.com")
+    html = c.get("/app").get_data(as_text=True)
+    forms = re.findall(r'<form[^>]*action="/logout"[^>]*>.*?</form>', html, flags=re.S)
+    assert len(forms) == 2, "sidebar and profile menu"
+    for f in forms:
+        assert 'method="post"' in f and "data-logout" in f and 'name="csrf_token"' in f and 'type="submit"' in f
+    js = (ROOT / "static" / "js" / "shell.js").read_text(encoding="utf-8")
+    assert "form[data-logout]" in js and "dataset.busy" in js and "Signing out" in js and "persisted" in js and "Are you sure you want to sign out?" in js
+    routes = [r.rule for r in appmod.app.url_map.iter_rules() if "logout" in r.rule]
+    assert routes == ["/logout"], "exactly one logout route"
+    print("ok both logout buttons are CSRF-protected POST forms with a loading state and double-submit guard; one logout route")
+
+
+
+def test_after_logout_no_user_details_reach_a_signed_out_visitor():
+    fresh()
+    from webapp.models import User as _U
+    a = helpers.logged_in_client("clin.a@example.com", name="Dr. Alice Fernandez")
+    helpers.logged_in_client("clin.b@example.com", name="Dr. Bruno Okafor")
+    with appmod.app.app_context():
+        u = _U.query.filter_by(email="clin.a@example.com").one()
+        u.institution = "Alpha Neuro Institute"
+        db.session.commit()
+    marks = ("Alice Fernandez", "clin.a@example.com", "Alpha Neuro Institute")
+    assert all(m in a.get("/app/profile").get_data(as_text=True) for m in marks[1:]), "the details are shown while signed in"
+    out = a.post("/logout")
+    assert out.headers["Clear-Site-Data"] == '"cache"' and "no-store" in out.headers["Cache-Control"], "browsers are told to drop cached pages"
+    for path in ("/", "/login", "/signup", "/terms", "/privacy", "/forgot-password", "/api/model-info", "/api/samples"):
+        body = a.get(path).get_data(as_text=True)
+        assert not [m for m in marks if m in body.replace("You have been signed out successfully.", "")], path
+        assert 'id="sidebar"' not in body and 'id="profileMenu"' not in body and ">Dashboard<" not in body, path
+    for path in ("/app", "/app/profile", "/app/cases", "/app/history", "/app/reports", "/app/settings", "/app/notifications", "/app/analysis"):
+        r = a.get(path)
+        assert r.status_code == 302 and "/login" in r.headers["Location"] and not [m for m in marks if m in r.get_data(as_text=True)], path
+    for path in ("/api/reports", "/api/reports/export", "/api/reports/NI-20260101-0A1B2C3D"):
+        r = a.get(path)
+        assert r.status_code == 401 and not [m for m in marks if m in r.get_data(as_text=True)], path
+    b = helpers.logged_in_client("clin.b@example.com")                                  # the next clinician sees only their own details
+    page = b.get("/app/profile").get_data(as_text=True)
+    assert "Bruno Okafor" in page and not [m for m in marks if m in page]
+    print("ok after logout no clinician details reach a signed-out visitor (pages, APIs, cache headers); the next user sees only their own")
 
 
 if __name__ == "__main__":

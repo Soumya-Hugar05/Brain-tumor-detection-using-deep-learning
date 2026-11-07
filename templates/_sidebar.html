@@ -20,7 +20,7 @@
     {% endif %}
   </nav>
   <div class="sidebar-foot">
-    <form method="post" action="{{ url_for('auth.logout') }}">
+    <form method="post" action="{{ url_for('auth.logout') }}" data-logout>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <button type="submit" class="sidebar-logout">{{ icon('log-out') }}<span>Logout</span></button>
     </form>

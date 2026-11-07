@@ -33,6 +33,23 @@
     });
   }
 
+  // Logout: show a loading state and block a second submission while the request is in flight.
+  document.querySelectorAll("form[data-logout]").forEach((form) => {
+    form.addEventListener("submit", (e) => {
+      if (form.dataset.busy) { e.preventDefault(); return; }
+      if (!window.confirm("Are you sure you want to sign out?")) { e.preventDefault(); return; }
+      form.dataset.busy = "1";
+      try { localStorage.removeItem("neuroinsight-theme"); } catch (_) { /* storage unavailable */ }   // no per-user preference stays behind for the next person
+      document.querySelectorAll("form[data-logout]").forEach((f) => { f.dataset.busy = "1"; });   // sidebar and menu share one request
+      setTimeout(() => form.querySelectorAll("button").forEach((b) => {
+        b.setAttribute("aria-busy", "true"); b.disabled = true;
+        const label = b.querySelector("span") || b;
+        label.textContent = "Signing out…";
+      }), 0);
+    });
+  });
+  window.addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });   // Back button: never show a restored authenticated page
+
   // Dates and times are stored in UTC; show them in the viewer's own time zone.
   const today = document.getElementById("today");
   if (today) today.textContent = new Date().toLocaleDateString([], { weekday: "long", year: "numeric", month: "long", day: "numeric" });
