@@ -81,8 +81,18 @@ def _ctx(active: str, **extra):
 @bp.get("/app")
 @protected()
 def home():
-    first = (current_user.full_name or "").split(" ")[0] or "there"
-    return render_template("dashboard.html", **_ctx("dashboard.home", first_name=first, **dashboard_data(current_user)))
+    return render_template("dashboard.html", **_ctx("dashboard.home", first_name=_greeting_name(current_user.full_name), **dashboard_data(current_user)))
+
+
+_TITLES = {"dr", "prof", "professor", "mr", "mrs", "ms", "mx", "miss"}
+
+
+def _greeting_name(full_name: str | None) -> str:
+    """The name used in the greeting: the first name, keeping a leading title ("Dr. Aarav", not just "Dr."). Nothing is stored or changed."""
+    parts = (full_name or "").split()
+    if len(parts) > 1 and parts[0].rstrip(".").lower() in _TITLES:
+        return f"{parts[0]} {parts[1]}"
+    return parts[0] if parts else "there"
 
 
 @bp.get("/app/model")
